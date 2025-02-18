@@ -1,4 +1,5 @@
 import summaryCardStruc from "./summaryCard.html";
+import { setAnimation } from "../canvasAnimation/animationHandler";
 
 export const newSummaryCardComponent = function (weatherData) {
   const struct = `
@@ -27,6 +28,8 @@ export const newSummaryCardComponent = function (weatherData) {
   component.className = "summary-card";
   component.innerHTML = struct;
   const animationCanvas = component.querySelector(".card-animation");
-
+  setTimeout(() => {
+    setAnimation(animationCanvas, weatherData);
+  }, 0);
   return component;
 };

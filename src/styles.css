@@ -1,6 +1,6 @@
 :root {
     --grey-font: rgba(244, 244, 244, 0.918); 
-    --white-transparent: rgba(255, 255, 255, 0.881);
+    --white-transparent: rgba(255, 255, 255, 0.943);
 }
 
 
@@ -41,7 +41,7 @@ body {
 }
 
 .summary-card {
-    background-color: skyblue;
+    position: relative;
 }
 
 .top {
@@ -72,6 +72,8 @@ body {
     flex-direction: column;
     gap: 2rem;
     padding: 0.5rem 0.55rem;
+    background-color: transparent;
+
 }
 
 .location-name {
@@ -90,4 +92,9 @@ body {
 
 .text-summary {
     color: var(--white-transparent);
+}
+
+.card-animation {
+    position: absolute;
+    z-index: -10;
 }
