@@ -1,3 +1,3 @@
 import { puffyCloud } from "./modules/puffy-clouds";
 
-export { puffyCloud };
+export const chooseAnimation = function (weatherData) {};

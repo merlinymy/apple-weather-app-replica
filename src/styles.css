@@ -1,0 +1,93 @@
+:root {
+    --grey-font: rgba(244, 244, 244, 0.918); 
+    --white-transparent: rgba(255, 255, 255, 0.881);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'sf-pro-round-regular';
+}
+
+@font-face {
+    font-family: sf-pro-round-bold;
+    src: url(./assets/fonts/SF-Pro-Rounded-Bold.otf);
+}
+
+@font-face {
+    font-family: sf-pro-round-regular;
+    src: url(./assets/fonts/SF-Pro-Rounded-Regular.otf);
+}
+
+@font-face {
+    font-family: sf-pro-round-semibold;
+    src: url(./assets/fonts/SF-Pro-Rounded-Semibold.otf);
+}
+
+
+body {
+    height: 100dvh;
+    /* width: 0dvw; */
+}
+
+.hidden {
+    display: none;
+}
+
+.side-bar {
+    padding: 0.55rem
+}
+
+.summary-card {
+    background-color: skyblue;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+}
+
+.temp-wrap {
+    display: flex;
+    gap: 1rem;
+    font-family: 'sf-pro-round-regular';
+
+}
+
+.current-temp {
+    font-size: 2.5rem;
+    font-family: 'sf-pro-round-regular';
+
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0.5rem 0.55rem;
+}
+
+.location-name {
+    font-size: 1.5rem;
+    font-family: 'sf-pro-round-bold';
+}
+
+.bold-grey-shadow {
+    color: var(--grey-font);
+    text-shadow: rgb(160, 160, 160) 0 0 3px;
+}
+
+.time {
+    color: var(--white-transparent);
+}
+
+.text-summary {
+    color: var(--white-transparent);
+}
