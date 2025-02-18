@@ -18,12 +18,50 @@ export const setAnimation = async function (div, weatherData) {
   });
   setBackgroundColor(app, time, currentConditions);
   setSunMoonPosition(app, time);
+  setClouds(app, currentConditions);
   //   puffyCloud(app);
   div.appendChild(app.canvas);
 };
 
 const setBackgroundColor = function (app, time, currentConditions) {
-  app.renderer.background.color = "blue";
+  const curTime = convertToDate(time);
+  const sunriseTime = convertToDate("7:00 AM");
+  const sunsetTime = convertToDate("7:00 PM");
+
+  let baseColor;
+
+  // 🌅 Determine Base Color Based on Time of Day
+  if (curTime >= sunriseTime && curTime <= sunsetTime) {
+    baseColor = "#87CEEB"; // Daytime sky (light blue)
+    if (
+      curTime < convertToDate("8:00 AM") ||
+      curTime > convertToDate("5:00 PM")
+    ) {
+      baseColor = "#c0b9ff"; // Soft peach near sunrise/sunset
+    }
+  } else {
+    baseColor = "#1B263B"; // Deep blue night sky
+  }
+
+  // 🌦 Modify Base Color Based on Weather Conditions
+  const condition = currentConditions.toLowerCase();
+
+  if (condition.includes("clear")) {
+    baseColor = baseColor; // No change, sky remains as per time
+  } else if (condition.includes("partially cloudy")) {
+    baseColor = "#A0C4FF"; // Light blue with a subtle cloudy tint
+  } else if (condition.includes("overcast") || condition.includes("fog")) {
+    baseColor = "#A9A9A9"; // Grayish sky for cloudy/overcast conditions
+  } else if (condition.includes("rain") || condition.includes("drizzle")) {
+    baseColor = "#708090"; // Grayish blue for rainy weather
+  } else if (condition.includes("thunderstorm")) {
+    baseColor = "#4B0082"; // Deep purple for stormy atmosphere
+  } else if (condition.includes("snow")) {
+    baseColor = "#DDEEFF"; // Very light blue to reflect snowy brightness
+  }
+
+  // Apply the background color
+  app.renderer.background.color = baseColor;
 };
 
 const setSunMoonPosition = async function (app, time) {
@@ -55,7 +93,7 @@ const setSunMoonPosition = async function (app, time) {
     sunSprite.anchor.set(0.5, 0.5);
     sunSprite.position.set(progress * rendererWidth, 30);
 
-    let rotationSpeed = 0.0001; // Adjust for smoother or faster movement
+    let rotationSpeed = 0.0002; // Adjust for smoother or faster movement
     let rotationDirection = 1; // 1 = forward, -1 = backward
     const maxRotation = 1; // Max angle for the swinging effect (radians)
 
