@@ -33,6 +33,19 @@ const setBackgroundColor = function (app, time, currentConditions) {
   // 🌅 Determine Base Color Based on Time of Day
   if (curTime >= sunriseTime && curTime <= sunsetTime) {
     baseColor = "#87CEEB"; // Daytime sky (light blue)
+    if (condition.includes("clear")) {
+      baseColor = baseColor; // No change, sky remains as per time
+    } else if (condition.includes("partially cloudy")) {
+      baseColor = "#A0C4FF"; // Light blue with a subtle cloudy tint
+    } else if (condition.includes("overcast") || condition.includes("fog")) {
+      baseColor = "#A9A9A9"; // Grayish sky for cloudy/overcast conditions
+    } else if (condition.includes("rain") || condition.includes("drizzle")) {
+      baseColor = "#708090"; // Grayish blue for rainy weather
+    } else if (condition.includes("thunderstorm")) {
+      baseColor = "#4B0082"; // Deep purple for stormy atmosphere
+    } else if (condition.includes("snow")) {
+      baseColor = "#DDEEFF"; // Very light blue to reflect snowy brightness
+    }
     if (
       curTime < convertToDate("8:00 AM") ||
       curTime > convertToDate("5:00 PM")
@@ -45,20 +58,6 @@ const setBackgroundColor = function (app, time, currentConditions) {
 
   // 🌦 Modify Base Color Based on Weather Conditions
   const condition = currentConditions.toLowerCase();
-
-  if (condition.includes("clear")) {
-    baseColor = baseColor; // No change, sky remains as per time
-  } else if (condition.includes("partially cloudy")) {
-    baseColor = "#A0C4FF"; // Light blue with a subtle cloudy tint
-  } else if (condition.includes("overcast") || condition.includes("fog")) {
-    baseColor = "#A9A9A9"; // Grayish sky for cloudy/overcast conditions
-  } else if (condition.includes("rain") || condition.includes("drizzle")) {
-    baseColor = "#708090"; // Grayish blue for rainy weather
-  } else if (condition.includes("thunderstorm")) {
-    baseColor = "#4B0082"; // Deep purple for stormy atmosphere
-  } else if (condition.includes("snow")) {
-    baseColor = "#DDEEFF"; // Very light blue to reflect snowy brightness
-  }
 
   // Apply the background color
   app.renderer.background.color = baseColor;
