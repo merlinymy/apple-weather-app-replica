@@ -25,7 +25,7 @@ export const filterDataForSummaryCard = async function (response, latlon) {
   } else {
     location = response.resolvedAddress.split(",")[0];
   }
-  const time = getTimeFromTimezone(response.timezone); // refresh every minute
+  const timezone = response.timezone;
   const currentTemp = Math.round(response.currentConditions.temp);
   const currentConditions = response.currentConditions.conditions;
   const maxTemp = Math.round(
@@ -39,5 +39,12 @@ export const filterDataForSummaryCard = async function (response, latlon) {
     }).tempmin,
   );
 
-  return { location, time, currentTemp, currentConditions, maxTemp, minTemp };
+  return {
+    location,
+    timezone,
+    currentTemp,
+    currentConditions,
+    maxTemp,
+    minTemp,
+  };
 };

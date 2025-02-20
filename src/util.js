@@ -10,6 +10,11 @@ export const getTimeFromTimezone = function (tzString) {
   }).format(new Date());
 };
 
+export const updateTime = function (div, timezone) {
+  div.innerHTML = getTimeFromTimezone(timezone);
+  setTimeout(() => updateTime(div, timezone), 1000);
+};
+
 export const getCurrentDate = function (tzString) {
   return new Intl.DateTimeFormat("en-CA", {
     tzString,

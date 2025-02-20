@@ -2,13 +2,14 @@ import { Application, Assets, Sprite } from "pixi.js";
 import sun from "../assets/sprites/sun.png";
 import moon from "../assets/sprites/moon.png";
 import sun_orb from "../assets/sprites/sun_orb.png";
-import { convertToDate } from "../util";
+import { convertToDate, getTimeFromTimezone } from "../util";
 import { puffyCloud } from "./modules/puffy-clouds";
 import puffy1 from "../assets/sprites/puffy1.png";
 
 export const setAnimation = async function (div, weatherData) {
   console.log(weatherData);
-  const time = weatherData.time;
+  const timezone = weatherData.timezone;
+  const time = getTimeFromTimezone(getTimeFromTimezone);
   const currentConditions = weatherData.currentConditions;
   //   const
   const app = new Application();
@@ -27,6 +28,7 @@ const setBackgroundColor = function (app, time, currentConditions) {
   const curTime = convertToDate(time);
   const sunriseTime = convertToDate("7:00 AM");
   const sunsetTime = convertToDate("7:00 PM");
+  const condition = currentConditions.toLowerCase();
 
   let baseColor;
 
@@ -57,7 +59,6 @@ const setBackgroundColor = function (app, time, currentConditions) {
   }
 
   // 🌦 Modify Base Color Based on Weather Conditions
-  const condition = currentConditions.toLowerCase();
 
   // Apply the background color
   app.renderer.background.color = baseColor;

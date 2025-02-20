@@ -1,5 +1,6 @@
 import summaryCardStruc from "./summaryCard.html";
 import { setAnimation } from "../canvasAnimation/animationHandler";
+import { updateTime } from "../util";
 
 export const newSummaryCardComponent = function (weatherData) {
   const struct = `
@@ -10,7 +11,7 @@ export const newSummaryCardComponent = function (weatherData) {
         <div class="top">
             <div class="name-and-time">
                 <div class="location-name bold-grey-shadow">${weatherData.location}</div>
-                <div class="time">${weatherData.time}</div>
+                <div class="time"></div>
             </div>
             <div class="current-temp bold-grey-shadow">${weatherData.currentTemp}\u00B0</div>
         </div>
@@ -24,9 +25,12 @@ export const newSummaryCardComponent = function (weatherData) {
     </div>
   
   `;
+
   const component = document.createElement("div");
   component.className = "summary-card";
   component.innerHTML = struct;
+  const timeDiv = component.querySelector(".time");
+  updateTime(timeDiv, weatherData.timezone);
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
     setAnimation(animationCanvas, weatherData);
