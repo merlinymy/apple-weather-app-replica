@@ -1,7 +1,7 @@
 import { Application, Assets, Sprite } from "pixi.js";
-import puffy1 from "../../assets/sprites/puffy1.png";
-import puffy2 from "../../assets/sprites/puffy2.png";
-import puffy3 from "../../assets/sprites/puffy3.png";
+import puffy1 from "../../assets/sprites/clouds/puffy1.png";
+import puffy2 from "../../assets/sprites/clouds/puffy2.png";
+import puffy3 from "../../assets/sprites/clouds/puffy3.png";
 
 export const puffyCloud = async function (app, numberofCloud, hue) {
   await Promise.all([

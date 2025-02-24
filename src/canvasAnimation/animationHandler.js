@@ -3,8 +3,6 @@ import sun from "../assets/sprites/sun.png";
 import moon from "../assets/sprites/moon.png";
 import sun_orb from "../assets/sprites/sun_orb.png";
 import { convertToDate, getTimeFromTimezone } from "../util";
-import { puffyCloud } from "./modules/puffy-clouds";
-import puffy1 from "../assets/sprites/puffy1.png";
 
 export const setAnimation = async function (div, weatherData) {
   console.log(weatherData);
