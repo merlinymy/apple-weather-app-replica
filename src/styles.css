@@ -37,12 +37,13 @@ body {
 }
 
 .side-bar {
-    padding: 0.55rem
+    padding: 0.55rem;
     
 }
 
 .summary-card {
     position: relative;
+    cursor: pointer;
 }
 
 .top {
@@ -99,3 +100,4 @@ body {
     position: absolute;
     z-index: -10;
 }
+
