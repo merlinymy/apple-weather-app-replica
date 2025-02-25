@@ -1,6 +1,6 @@
 import summaryCardStruc from "./summaryCard.html";
 import { setAnimation } from "../canvasAnimation/animationHandler";
-import { updateTime } from "../util";
+import { getDivCenter, updateTime } from "../util";
 import { filterDataForSummaryCards } from "../data/dataHandler";
 
 export const newSummaryCardComponent = async function (weatherData, query) {
@@ -41,7 +41,7 @@ export const newSummaryCardComponent = async function (weatherData, query) {
     setAnimation(animationCanvas, summaryData);
   }, 0);
   component.addEventListener("click", () => {
-    console.log(weatherData);
+    createWeatherCard(weatherData, summaryData, getDivCenter(component));
   });
   return component;
 };

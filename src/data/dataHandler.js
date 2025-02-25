@@ -13,6 +13,7 @@ export const startWeatherUpdates = async function (query, unit, isLatLon) {
       const weatherData = await weatherResponse.json();
       console.log(weatherData);
       await updateSummaryCard(weatherData, query);
+
       hideMessage("no-content-msg");
     } catch (error) {
       console.error("Error fetching weather:", error);

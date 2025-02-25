@@ -1,5 +1,17 @@
 import { newSummaryCardComponent } from "./components/summaryCard";
 import { filterDataForSummaryCards } from "./data/dataHandler";
+import { weatherDetailCard } from "./components/weatherDetailCard";
+
+export const createWeatherCard = function (
+  weatherData,
+  summaryData,
+  divCenter,
+) {
+  const mainContent = document.querySelector(".main-content");
+  const component = weatherDetailCard(weatherData, summaryData);
+  mainContent.append(component);
+};
+
 export const updateSummaryCard = async function (weatherData, query) {
   const summaryData = await filterDataForSummaryCards(weatherData, query);
 
