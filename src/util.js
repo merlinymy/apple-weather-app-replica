@@ -8,8 +8,6 @@ export const getDivCenter = function (div) {
   return { x: centerX, y: centerY };
 };
 
-export const isIn24Hours = function (datetime) {};
-
 export const getTimeFromTimezone = function (tzString) {
   // https://stackoverflow.com/questions/10087819/convert-date-to-another-timezone-in-javascript
   return new Intl.DateTimeFormat("en-US", {

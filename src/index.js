@@ -19,7 +19,13 @@ import {
 const userLocationLatLon = await askForGeolocation();
 const weatherResponse = await getResponseFromLatLon(userLocationLatLon, "us");
 const weatherData = await weatherResponse.json();
-const summaryData = filterDataForSummaryCards(weatherData, userLocationLatLon);
+console.log(weatherData);
+const summaryData = await filterDataForSummaryCards(
+  weatherData,
+  userLocationLatLon,
+);
+
+console.log(summaryData);
 if (userLocationLatLon) {
   createWeatherCard(weatherData, summaryData);
   // startWeatherUpdates(userLocationLatLon, "us", true);

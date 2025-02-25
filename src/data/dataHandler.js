@@ -28,7 +28,7 @@ export const getResponseFromLatLon = async function (latlon, unit) {
   const api_key = "UFGA2UZ292DF95ZP7TNJQEYGD";
   const lat = latlon.lat;
   const lon = latlon.lon;
-  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat}%2C${lon}?unitGroup=${unit}&key=${api_key}&contentType=json`;
+  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat}%2C${lon}?unitGroup=${unit}&key=${api_key}&contentType=json&elements=%2Baqius`;
   return await fetch(url);
 };
 
