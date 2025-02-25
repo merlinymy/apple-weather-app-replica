@@ -1,10 +1,10 @@
 import { TZDate } from "@date-fns/tz";
-import { addDays, addHours, format } from "date-fns";
+import { addDays, addHours, format, isAfter, isBefore, sub } from "date-fns";
 import { setAnimation } from "../canvasAnimation/animationHandler";
 
 export const weatherDetailCard = function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
-  console.log(weatherData);
+  console.log(data);
   const struct = `
   <div class="card-animation">
   </div>
@@ -20,9 +20,12 @@ export const weatherDetailCard = function (weatherData, summaryData) {
         </div>
     </div>
     </div>
+
+    <div class="forcast-24-wrap">
     <div class="forcast-24hr">
         <div class="desc">${data.description}</div>
-        <div class="24-hour"></div>
+        <div class="hour24"></div>
+    </div>
     </div>
     <div class="forcast-10days"></div>
     <div class="air-quality"></div>
@@ -38,6 +41,8 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   const component = document.createElement("div");
   component.innerHTML = struct;
   component.classList.add("detailcard");
+  const hour24Scroll = component.querySelector(".hour24");
+  populateScroll(data, hour24Scroll);
 
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
@@ -46,6 +51,22 @@ export const weatherDetailCard = function (weatherData, summaryData) {
 
   return component;
 };
+
+function populateScroll(data, hour24Scroll) {
+  data.next24hrs.forEach((entry) => {
+    const hourlyInfo = document.createElement("div");
+    const timeInfo = document.createElement("p");
+    timeInfo.textContent = entry.time;
+    const conditionIcon = document.createElement("div");
+    let weatherIcon;
+    conditionIcon.append(weatherIcon);
+    const tempInfo = document.createElement("p");
+    tempInfo.textContent = entry.temp;
+    hourlyInfo.classList.add("houly-info");
+    hourlyInfo.append(timeInfo, conditionIcon, tempInfo);
+    hour24Scroll.append(hourlyInfo);
+  });
+}
 
 function isIn24Hours(now, future, timeTocheck) {
   return timeTocheck >= now && timeTocheck <= future;
@@ -64,8 +85,9 @@ function aggregateData(weatherData, summaryData) {
   const summary = summaryData.currentConditions;
   const description = weatherData.description;
   const airQuality = weatherData.currentConditions.aqius;
-  // const timezone = weatherData.timezone;
-  const timezone = "America/Los_Angeles";
+  const timezone = weatherData.timezone;
+  const sunrise = weatherData;
+  // const timezone = "America/Los_Angeles";
 
   const days = weatherData.days;
 
@@ -95,11 +117,14 @@ function aggregateData(weatherData, summaryData) {
     new TZDate(new Date(), `${timezone}`),
     "yyyy-MM-dd HH:00:00",
   );
+  console.log(nowHour);
   const in24hours = format(addHours(nowHour, 24), "yyyy-MM-dd HH:00:00");
 
   const next24hrs = days
     .reduce((acc, day) => {
       const date = day.datetime;
+      const sunrise = `${date} ${day.sunrise}`;
+      const sunset = `${date} ${day.sunset}`;
 
       const filtered = day.hours
         .filter((hour) => {
@@ -109,10 +134,43 @@ function aggregateData(weatherData, summaryData) {
           data.datetime = `${date} ${data.datetime}`;
           return data;
         });
+
+      // compare sunrise and sunset to the last element of acc and the element in filtered
+      // if it's between the two values, prepend to filtered
+      // if acc is empty and sunrise/sunset is within one hour of the element in filtered
+      // prepend
+      if (filtered.length !== 0) {
+        for (let i = 0; i < filtered.length - 1; i++) {
+          if (
+            isAfter(sunrise, filtered[i].datetime) &&
+            isBefore(sunrise, filtered[i + 1].datetime)
+          ) {
+            filtered.splice(i + 1, 0, {
+              datetime: sunrise,
+              condition: "Sunrise",
+            });
+          }
+          if (
+            isAfter(sunset, filtered[i].datetime) &&
+            isBefore(sunset, filtered[i + 1].datetime)
+          ) {
+            console.log(sunset);
+            filtered.splice(i + 1, 0, {
+              datetime: sunset,
+              condition: "Sunset",
+            });
+          }
+        }
+      }
       return acc.concat(filtered);
     }, [])
     .map((data, idx) => {
       let time = data.datetime;
+      if (data.condition === "Sunrise" || data.condition === "Sunset") {
+        time = format(data.datetime, "h:ma");
+        const temp = data.condition;
+        return { time, temp };
+      }
       if (idx === 0) {
         time = "Now";
       } else {
