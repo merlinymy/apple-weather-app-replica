@@ -5,9 +5,6 @@ import { filterDataForSummaryCards } from "../data/dataHandler";
 
 export const newSummaryCardComponent = async function (weatherData, query) {
   const summaryData = await filterDataForSummaryCards(weatherData, query);
-
-  console.log(summaryData);
-
   const struct = `
 
     <div class="card-animation">

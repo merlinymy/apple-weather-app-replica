@@ -22,7 +22,6 @@ import windy from "../assets/icons/windy.png";
 
 export const weatherDetailCard = function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
-  console.log(data);
   const struct = `
   <div class="card-animation">
   </div>
@@ -65,6 +64,8 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   populateScroll(data, hour24Scroll);
 
   // 10 days forcast
+  const tenDayForcastWrap = component.querySelector(".forcast-10days");
+  populateTenDay(data, tenDayForcastWrap);
 
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
@@ -75,8 +76,25 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   return component;
 };
 
-function populateScroll(data, hour24Scroll) {
+function populateTenDay(data, component) {
+  const cardTitle = document.createElement("div");
+  cardTitle.classList.add("card-title");
+  const titleP = document.createElement("p");
+  const cardIcon = document.createElement("span");
+  cardIcon.classList.add("material-symbols-outlined");
+  cardIcon.textContent = "calendar_month";
+  titleP.textContent = "10-DAY FORECAST";
+  cardTitle.append(cardIcon, titleP);
+
+  const cardContent = document.createElement("div");
+  const tenDaysData = data.next10days;
+  // const tenDaysLow = tenDaysData.
   console.log(data);
+
+  component.append(cardTitle);
+}
+
+function populateScroll(data, hour24Scroll) {
   data.next24hrs.forEach((entry) => {
     const hourlyInfo = document.createElement("div");
     const timeInfo = document.createElement("p");
@@ -86,14 +104,35 @@ function populateScroll(data, hour24Scroll) {
 
     timeInfo.textContent = entry.time.slice(0, -2);
     timeInfo.append(ampmSpan);
+    const iconInfo = document.createElement("div");
+    iconInfo.classList.add("iconInfo");
+
     const conditionIcon = document.createElement("img");
     conditionIcon.classList.add("condition-icon");
 
     const isSunRaise = entry.isSunRaise;
+
     conditionIcon.src = chooseWeatherIcon(
       entry.condition.toLowerCase(),
       isSunRaise,
     );
+    iconInfo.append(conditionIcon);
+
+    // precip prob
+    if (
+      entry.condition.toLowerCase().includes("rain") ||
+      entry.condition.toLowerCase().includes("snow") ||
+      entry.condition.toLowerCase().includes("drizzle") ||
+      entry.condition.toLowerCase().includes("thunderstorm") ||
+      entry.condition.toLowerCase().includes("sleet") ||
+      entry.condition.toLowerCase().includes("bnlizzard")
+    ) {
+      const precipProb = document.createElement("div");
+      precipProb.classList.add("precip-prob");
+      precipProb.textContent = `${entry.precipprob}%`;
+      iconInfo.append(precipProb);
+    }
+
     // conditionIcon.append(clear);
     const tempInfo = document.createElement("p");
     if (entry.temp === "Sunrise" || entry.temp === "Sunset") {
@@ -102,7 +141,7 @@ function populateScroll(data, hour24Scroll) {
       tempInfo.textContent = `${entry.temp}\u00B0`;
     }
     hourlyInfo.classList.add("hourly-info");
-    hourlyInfo.append(timeInfo, conditionIcon, tempInfo);
+    hourlyInfo.append(timeInfo, iconInfo, tempInfo);
     hour24Scroll.append(hourlyInfo);
   });
 }
@@ -189,13 +228,10 @@ function aggregateData(weatherData, summaryData) {
       return { dayOfWeek, condition, low, high, precipprob };
     });
 
-  console.log(next10days);
-
   const nowHour = format(
     new TZDate(new Date(), `${timezone}`),
     "yyyy-MM-dd HH:00:00",
   );
-  console.log(nowHour);
   const in24hours = format(addHours(nowHour, 24), "yyyy-MM-dd HH:00:00");
 
   const next24hrs = days
@@ -237,7 +273,6 @@ function aggregateData(weatherData, summaryData) {
             isAfter(sunset, filtered[i].datetime) &&
             isBefore(sunset, filtered[i + 1].datetime)
           ) {
-            console.log(sunset);
             filtered.splice(i + 1, 0, {
               datetime: sunset,
               condition: "Sunset",
@@ -266,7 +301,6 @@ function aggregateData(weatherData, summaryData) {
       const isSunRaise = data.isSunRaise;
       return { time, condition, temp, precipprob, isSunRaise };
     });
-  console.log(next24hrs);
 
   return {
     location,

@@ -5,13 +5,12 @@ import { hideMessage } from "../uiHandler";
 export const startWeatherUpdates = async function (query, unit, isLatLon) {
   async function fetchAndUpdate() {
     try {
-      console.log(query);
       const weatherResponse = isLatLon
         ? await getResponseFromLatLon(query, unit)
         : await getResponseFromName(query, unit);
 
       const weatherData = await weatherResponse.json();
-      console.log(weatherData);
+
       await updateSummaryCard(weatherData, query);
 
       hideMessage("no-content-msg");

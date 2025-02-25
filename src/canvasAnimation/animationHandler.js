@@ -5,7 +5,6 @@ import sun_orb from "../assets/sprites/sun_orb.png";
 import { convertToDate, getTimeFromTimezone } from "../util";
 
 export const setAnimation = async function (div, weatherData) {
-  console.log(weatherData);
   const timezone = weatherData.timezone;
   const time = getTimeFromTimezone(getTimeFromTimezone);
   const currentConditions = weatherData.currentConditions;
