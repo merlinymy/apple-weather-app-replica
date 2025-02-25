@@ -8,20 +8,22 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   const high = summaryData.maxTemp;
   const low = summaryData.minTemp;
   const summary = summaryData.description;
-  const timezone = weatherData.timezone;
+  // const timezone = weatherData.timezone;
+  const timezone = "America/Los_Angeles";
 
   const days = weatherData.days;
 
-  const today = format(new TZDate(new Date(), `${timezone}`), "yyyy-MM-dd");
+  const today = format(TZDate.tz(timezone), "yyyy-MM-dd");
   const tenDaysFromToday = format(addDays(today, 10), "yyyy-MM-dd");
-
   const next10days = days
     .filter((day) => {
       return isIn10Days(today, tenDaysFromToday, day.datetime);
     })
-    .map((day) => {
-      let dayOfWeek = format(day.datetime, "E");
-      if (day.datetime === today) {
+    .map((day, idx) => {
+      let dayOfWeek;
+
+      dayOfWeek = format(addDays(day.datetime, 1), "E");
+      if (idx === 0) {
         dayOfWeek = "Today";
       }
       const condition = day.conditions;
@@ -62,7 +64,8 @@ export const weatherDetailCard = function (weatherData, summaryData) {
       }
       const condition = data.conditions;
       const temp = data.temp;
-      return { time, condition, temp };
+      const precipprob = data.precipprob;
+      return { time, condition, temp, precipprob };
     });
   console.log(next24hrs);
 };
