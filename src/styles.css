@@ -183,7 +183,11 @@ p.current-temp {
     max-width: 900px; 
     width: 80dvw;
     border-radius: 15px;
-    background-color: rgba(255, 255, 255, 0.105);
+    background-color: rgba(35, 35, 35, 0.212);
+}
+
+.condition-icon {
+    width: 1.5rem;
 }
 
 .forcast-24hr{
@@ -196,7 +200,7 @@ p.current-temp {
 .forcast-24hr > .desc {
     position: relative;
     
-    padding: 0.5rem 0px 0.5rem 0.5rem;
+    padding: 0.75rem;
 }
 
 .forcast-24hr > .desc::before {
@@ -212,9 +216,30 @@ p.current-temp {
 
 .hour24 {
     overflow: scroll;
-
+    margin: 0.75rem 0rem;
     display: flex;
 
+    gap: 1.8rem;
+
+}
+
+.hourly-info:first-child {
+    margin-left: 0.75rem;
+}
+
+.hourly-info:last-child {
+    margin-right: 0.75rem;
+}
+
+.ampm {
+    font-size: 0.85rem;
+}
+
+.hourly-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .hour24::-webkit-scrollbar {

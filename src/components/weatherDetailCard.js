@@ -1,6 +1,24 @@
 import { TZDate } from "@date-fns/tz";
 import { addDays, addHours, format, isAfter, isBefore, sub } from "date-fns";
 import { setAnimation } from "../canvasAnimation/animationHandler";
+import blizzard from "../assets/icons/blizzard.png";
+import clear from "../assets/icons/clear.png";
+import clearnight from "../assets/icons/clearnight.png";
+import cloudy from "../assets/icons/cloudy.png";
+import drizzle from "../assets/icons/drizzle.png";
+import drizzlenight from "../assets/icons/drizzlenight.png";
+import fog from "../assets/icons/fog.png";
+import haze from "../assets/icons/haze.png";
+import heavyrain from "../assets/icons/heavyrain.png";
+import partly_cloudy from "../assets/icons/partly_cloudy.png";
+import partlycloudynight from "../assets/icons/partlycloudynight.png";
+import rain from "../assets/icons/rain.png";
+import sleet from "../assets/icons/sleet.png";
+import snow from "../assets/icons/snow.png";
+import sunrise from "../assets/icons/sunrise.png";
+import sunset from "../assets/icons/sunset.png";
+import thunderstorm from "../assets/icons/thunderstorm.png";
+import windy from "../assets/icons/windy.png";
 
 export const weatherDetailCard = function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
@@ -41,9 +59,14 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   const component = document.createElement("div");
   component.innerHTML = struct;
   component.classList.add("detailcard");
+
+  // 24 hour forcast
   const hour24Scroll = component.querySelector(".hour24");
   populateScroll(data, hour24Scroll);
 
+  // 10 days forcast
+
+  // background animation
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
     setAnimation(animationCanvas, summaryData);
@@ -53,19 +76,75 @@ export const weatherDetailCard = function (weatherData, summaryData) {
 };
 
 function populateScroll(data, hour24Scroll) {
+  console.log(data);
   data.next24hrs.forEach((entry) => {
     const hourlyInfo = document.createElement("div");
     const timeInfo = document.createElement("p");
-    timeInfo.textContent = entry.time;
-    const conditionIcon = document.createElement("div");
-    let weatherIcon;
-    conditionIcon.append(weatherIcon);
+    const ampmSpan = document.createElement("span");
+    ampmSpan.classList.add("ampm");
+    ampmSpan.textContent = entry.time.slice(-2);
+
+    timeInfo.textContent = entry.time.slice(0, -2);
+    timeInfo.append(ampmSpan);
+    const conditionIcon = document.createElement("img");
+    conditionIcon.classList.add("condition-icon");
+
+    const isSunRaise = entry.isSunRaise;
+    conditionIcon.src = chooseWeatherIcon(
+      entry.condition.toLowerCase(),
+      isSunRaise,
+    );
+    // conditionIcon.append(clear);
     const tempInfo = document.createElement("p");
-    tempInfo.textContent = entry.temp;
-    hourlyInfo.classList.add("houly-info");
+    if (entry.temp === "Sunrise" || entry.temp === "Sunset") {
+      tempInfo.textContent = `${entry.temp}`;
+    } else {
+      tempInfo.textContent = `${entry.temp}\u00B0`;
+    }
+    hourlyInfo.classList.add("hourly-info");
     hourlyInfo.append(timeInfo, conditionIcon, tempInfo);
     hour24Scroll.append(hourlyInfo);
   });
+}
+
+function chooseWeatherIcon(condition, isRaise) {
+  const cond = categorize(condition);
+
+  switch (cond) {
+    case "Clear":
+      return isRaise ? clear : clearnight;
+    case "Partly cloudy":
+      return isRaise ? partly_cloudy : partlycloudynight;
+    case "Haze":
+    case "Smoke Or Haze":
+      return haze;
+    case "Fog":
+      return fog;
+    case "Windy":
+      return windy;
+    case "Drizzle":
+      return isRaise ? drizzle : drizzlenight;
+    case "Rain":
+      return rain;
+    case "Heavy rain":
+      return heavyrain;
+    case "Snow":
+      return snow;
+    case "Heavy snow":
+    case "Blizzard":
+      return blizzard;
+    case "Thunderstorm":
+      return thunderstorm;
+    case "Freezing rain":
+    case "Sleet":
+      return sleet;
+    case "Sunrise":
+      return sunrise;
+    case "Sunset":
+      return sunset;
+    default:
+      return cloudy; // Default fallback to cloudy icon
+  }
 }
 
 function isIn24Hours(now, future, timeTocheck) {
@@ -86,7 +165,6 @@ function aggregateData(weatherData, summaryData) {
   const description = weatherData.description;
   const airQuality = weatherData.currentConditions.aqius;
   const timezone = weatherData.timezone;
-  const sunrise = weatherData;
   // const timezone = "America/Los_Angeles";
 
   const days = weatherData.days;
@@ -132,13 +210,18 @@ function aggregateData(weatherData, summaryData) {
         })
         .map((data) => {
           data.datetime = `${date} ${data.datetime}`;
+
+          if (
+            isAfter(data.datetime, sunrise) &&
+            isBefore(data.datetime, sunset)
+          ) {
+            data.isSunRaise = true;
+          } else {
+            data.isSunRaise = false;
+          }
           return data;
         });
 
-      // compare sunrise and sunset to the last element of acc and the element in filtered
-      // if it's between the two values, prepend to filtered
-      // if acc is empty and sunrise/sunset is within one hour of the element in filtered
-      // prepend
       if (filtered.length !== 0) {
         for (let i = 0; i < filtered.length - 1; i++) {
           if (
@@ -169,7 +252,8 @@ function aggregateData(weatherData, summaryData) {
       if (data.condition === "Sunrise" || data.condition === "Sunset") {
         time = format(data.datetime, "h:ma");
         const temp = data.condition;
-        return { time, temp };
+        const condition = data.condition;
+        return { time, temp, condition };
       }
       if (idx === 0) {
         time = "Now";
@@ -179,7 +263,8 @@ function aggregateData(weatherData, summaryData) {
       const condition = data.conditions;
       const temp = Math.round(data.temp);
       const precipprob = data.precipprob;
-      return { time, condition, temp, precipprob };
+      const isSunRaise = data.isSunRaise;
+      return { time, condition, temp, precipprob, isSunRaise };
     });
   console.log(next24hrs);
 
@@ -195,4 +280,70 @@ function aggregateData(weatherData, summaryData) {
     description,
     airQuality,
   };
+}
+
+function categorize(apiCondition) {
+  // Always take the first condition before a comma
+  const primaryCondition = apiCondition.split(",")[0].trim().toLowerCase();
+
+  // Mapping conditions to icons
+  const conditionMapping = {
+    clear: "Clear",
+    "partially cloudy": "Partly cloudy",
+    haze: "Haze",
+    "smoke or haze": "Haze",
+    fog: "Fog",
+    "freezing fog": "Fog",
+    "dust storm": "Haze",
+    "sky coverage decreasing": "Partly cloudy",
+    "sky coverage increasing": "Cloudy",
+    "sky unchanged": "Cloudy",
+    overcast: "Cloudy",
+    windy: "Windy",
+
+    "light drizzle": "Drizzle",
+    drizzle: "Drizzle",
+    "heavy drizzle": "Drizzle",
+    "heavy drizzle/rain": "Drizzle",
+    "light drizzle/rain": "Drizzle",
+
+    rain: "Rain",
+    "light rain": "Rain",
+    "rain showers": "Rain",
+    "precipitation in vicinity": "Rain",
+    "light rain and snow": "Rain",
+    "snow and rain showers": "Rain",
+    "heavy rain": "Heavy rain",
+    "heavy rain and snow": "Heavy rain",
+
+    snow: "Snow",
+    "light snow": "Snow",
+    "snow showers": "Snow",
+    "blowing or drifting snow": "Snow",
+    "heavy snow": "Blizzard",
+    squalls: "Blizzard",
+
+    thunderstorm: "Thunderstorm",
+    "thunderstorm without precipitation": "Thunderstorm",
+    "lightning without thunder": "Thunderstorm",
+
+    "freezing rain": "Sleet",
+    "light freezing rain": "Sleet",
+    "heavy freezing rain": "Sleet",
+    "freezing drizzle/freezing rain": "Sleet",
+    "light freezing drizzle/freezing rain": "Sleet",
+    "heavy freezing drizzle/freezing rain": "Sleet",
+    ice: "Sleet",
+
+    hail: "Sleet",
+    "hail showers": "Sleet",
+    "diamond dust": "Sleet",
+
+    "funnel cloud/tornado": "Thunderstorm",
+    sunset: "Sunset",
+    sunrise: "Sunrise",
+  };
+
+  // Default to 'Cloudy' if condition not found
+  return conditionMapping[primaryCondition] || "clear";
 }
