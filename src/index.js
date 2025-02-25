@@ -19,16 +19,13 @@ import {
 const userLocationLatLon = await askForGeolocation();
 const weatherResponse = await getResponseFromLatLon(userLocationLatLon, "us");
 const weatherData = await weatherResponse.json();
-console.log(weatherData);
 const summaryData = await filterDataForSummaryCards(
   weatherData,
   userLocationLatLon,
 );
-
-console.log(summaryData);
 if (userLocationLatLon) {
   createWeatherCard(weatherData, summaryData);
-  // startWeatherUpdates(userLocationLatLon, "us", true);
+  startWeatherUpdates(userLocationLatLon, "us", true);
   hideMessage("no-content-msg");
 } else if (!userLocationLatLon && !document.querySelectorAll(".summary-card")) {
   showMessage("no-content-msg");

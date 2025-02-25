@@ -2,11 +2,17 @@
 </div>
 <div class="weather-page">
     <div class="overview">
-        <p class="location">${summaryData.location}</p>
-        <p class="current-temp">${summaryData.currentTemp}</p>
-        <p class="feels-like"></p>
+        <p class="location">${data.location}</p>
+        <p class="detail-current-temp">${data.currentTemp}</p>
+        <div class="lowhigh">
+            <p class="high"></p>
+            <p class="low"></p>
+        </div>
     </div>
-    <div class="forcast-24hr"></div>
+    <div class="forcast-24hr">
+        <div class="desc"></div>
+        <div class="24-hour"></div>
+    </div>
     <div class="forcast-10days"></div>
     <div class="air-quality"></div>
     <div class="feels-like"></div>

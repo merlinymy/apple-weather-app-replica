@@ -1,5 +1,6 @@
 import { TZDate } from "@date-fns/tz";
 import { addDays, addHours, format } from "date-fns";
+import { setAnimation } from "../canvasAnimation/animationHandler";
 
 export const weatherDetailCard = function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
@@ -8,14 +9,16 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   <div class="card-animation">
   </div>
   <div class="weather-page">
+  <div class="overview-wrap">
     <div class="overview">
         <p class="location">${data.location}</p>
-        <p class="current-temp">${data.currentTemp}</p>
+        <p class="current-temp">${data.currentTemp}\u00B0</p>
         <p class="condition">${data.summary}</p>
         <div class="lowhigh">
             <p class="high">H:${data.high}\u00B0</p>
             <p class="low">L:${data.low}\u00B0</p>
         </div>
+    </div>
     </div>
     <div class="forcast-24hr">
         <div class="desc">${data.description}</div>
@@ -34,6 +37,12 @@ export const weatherDetailCard = function (weatherData, summaryData) {
 </div>`;
   const component = document.createElement("div");
   component.innerHTML = struct;
+  component.classList.add("detailcard");
+
+  const animationCanvas = component.querySelector(".card-animation");
+  setTimeout(() => {
+    setAnimation(animationCanvas, summaryData);
+  }, 0);
 
   return component;
 };
@@ -54,6 +63,7 @@ function aggregateData(weatherData, summaryData) {
   const low = summaryData.minTemp;
   const summary = summaryData.currentConditions;
   const description = weatherData.description;
+  const airQuality = weatherData.currentConditions.aqius;
   // const timezone = weatherData.timezone;
   const timezone = "America/Los_Angeles";
 
@@ -125,5 +135,6 @@ function aggregateData(weatherData, summaryData) {
     next10days,
     next24hrs,
     description,
+    airQuality,
   };
 }

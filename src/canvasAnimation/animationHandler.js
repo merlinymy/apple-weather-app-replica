@@ -16,7 +16,7 @@ export const setAnimation = async function (div, weatherData) {
     resizeTo: cardContent,
   });
   setBackgroundColor(app, time, currentConditions);
-  setSunMoonPosition(app, time);
+  // setSunMoonPosition(app, time);
   setClouds(app, currentConditions);
   //   puffyCloud(app);
   div.appendChild(app.canvas);
@@ -30,7 +30,6 @@ const setBackgroundColor = function (app, time, currentConditions) {
 
   let baseColor;
 
-  // 🌅 Determine Base Color Based on Time of Day
   if (curTime >= sunriseTime && curTime <= sunsetTime) {
     baseColor = "#87CEEB"; // Daytime sky (light blue)
     if (condition.includes("clear")) {
@@ -55,12 +54,16 @@ const setBackgroundColor = function (app, time, currentConditions) {
   } else {
     baseColor = "#1B263B"; // Deep blue night sky
   }
-
-  // 🌦 Modify Base Color Based on Weather Conditions
+  setBodyBackgroundColor(baseColor);
 
   // Apply the background color
   app.renderer.background.color = baseColor;
 };
+
+function setBodyBackgroundColor(baseColor) {
+  const body = document.querySelector("body");
+  body.style.backgroundColor = baseColor;
+}
 
 const setSunMoonPosition = async function (app, time) {
   await Promise.all([
