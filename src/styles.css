@@ -11,7 +11,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'sf-pro-round-regular';
+    font-family: 'sf-pro-round-semibold';
 }
 
 @font-face {
@@ -151,22 +151,23 @@ body {
 }
 
 .overview > .location {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .overview > .condition {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     color: var(--grey-font);
 }
 
 .overview > .current-temp {
-    font-size: 4.75rem;
+    font-size: 4.95rem;
     font-family: 'sf-pro-round-thin';
 }
 
 .lowhigh {
     display: flex;
     gap: 0.5rem;
+    font-size: 1.15rem;
 }
 
 .weather-page {
@@ -203,7 +204,7 @@ p.current-temp {
 
 .forcast-24hr > .desc {
     position: relative;
-    
+    font-family: 'sf-pro-round-regular';
     padding: 0.75rem;
 }
 
@@ -257,7 +258,7 @@ p.current-temp {
     margin-top: -0.25rem;
 }
 
-.forcast-10days {
+.forcast-10days, .air-quality {
     display: flex;
     width: 90dvw;
     max-width: 460px;
@@ -268,17 +269,24 @@ p.current-temp {
     background-color: var(--card-bg);
 }
 
+.card-title-symbol {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+    color: var(--white-transparent2);
+}
+
 .card-title{
-    margin: 0.5rem 0.75rem 0.5rem 0.75rem;
+    margin: 0.5rem 0.75rem 0.5rem 0.25rem;
     display: flex;
     justify-content: flex-start;
+    letter-spacing: 1.5px;
+    color: var(--white-transparent2);
+    align-items: center;
 }
 
 
-.card-title,  .card-title-symbol {
-    font-size: 0.67rem;
-    letter-spacing: 1.5px;
-    color: var(--white-transparent2);
+.card-title > p {
+    font-size: 0.6rem;
 }
 
 
@@ -359,9 +367,52 @@ p.current-temp {
     height: 4px;
     width: 4px;
     background-color: white;
-    border: 1.5px solid black;
+    border: 1.5px solid rgba(128, 128, 128, 0.763);
     border-radius: 50px;
     box-sizing: content-box;
+}
+
+.aq-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.aq-content > * {
+    font-family: 'sf-pro-round-regular';
+}
+
+.aq-num {
+    font-size: 1.75rem;
+}
+
+.aq-concern, .aq-desc {
+    font-family: 'sf-pro-round-thin';
+    letter-spacing: 1px;
+    font-size: 0.9rem
+}
+
+.aq-bar {
+    position: relative;
+    width: 330px;
+    height: 4px;
+    border-radius: 50px;
+    align-self: center;
+    background: rgb(0,255,28);
+    background: linear-gradient(90deg, rgba(0,255,28,1) 7%, rgba(246,238,33,1) 17%, rgba(255,173,27,1) 28%, rgba(255,0,0,1) 38%, rgba(145,62,163,1) 49%, rgba(128,0,0,1) 100%);}
+
+.aq-dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: white;
+    box-sizing: content-box;
+    border-radius: 50px;
+    border: 1.5px solid rgba(128, 128, 128, 0.763);
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 @media (max-width: 720px) {
