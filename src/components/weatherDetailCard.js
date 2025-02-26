@@ -45,16 +45,15 @@ export const weatherDetailCard = function (weatherData, summaryData) {
         <div class="hour24"></div>
     </div>
     </div>
-    <div class="forcast-10days"></div>
-    <div class="air-quality"></div>
-    <div class="feels-like"></div>
-    <div class="uv-index"></div>
-    <div class="wind"></div>
-    <div class="sunset"></div>
-    <div class="precipitation"></div>
-    <div class="visibility"></div>
-    <div class="humidity"></div>
-    <div class="moon-phase"></div>
+    <div class="forcast-10days long-card"></div>
+    <div class="air-quality long-card"></div>
+    <div class="feels-like short-card"></div>
+    <div class="uv-index short-card"></div>
+    <div class="wind long-card"></div>
+    <div class="sunset short-card"></div>
+    <div class="precipitation short-card"></div>
+    <div class="visibility short-card"></div>
+    <div class="humidity short-card"></div>
 </div>`;
   const component = document.createElement("div");
   component.innerHTML = struct;
@@ -73,13 +72,30 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   populateAirQuality(data, airQualityDiv);
 
   // feels-like
+  const feelsLikeDiv = component.querySelector(".feels-like");
+  populateFeelsLike(data, feelsLikeDiv);
+
   // uv-index
+
+  const uvDiv = component.querySelector(".uv-index");
+  populateUvDiv(data, uvDiv);
   // wind
+
+  const windDiv = component.querySelector(".wind");
+  populateWind(data, windDiv);
   // sunset
+  const sunsetDiv = component.querySelector(".sunset");
+  populateSunset(data, sunsetDiv);
   // precipitation
+
+  const precipitationDiv = component.querySelector(".precipitation");
+  populatePrecip(data, precipitationDiv);
   // visibility
+  const visibilityDiv = component.querySelector(".visibility");
+  populateVisibility(data, visibilityDiv);
   // humidity
-  // moon-phase
+  const humidityDiv = component.querySelector(".humidity");
+  populateHumidity(data, humidityDiv);
 
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
@@ -89,6 +105,52 @@ export const weatherDetailCard = function (weatherData, summaryData) {
 
   return component;
 };
+
+function populateHumidity(data, component) {
+  const vis = data.currentCond.humidity;
+  const cardTitle = createCardTitle("HUMIDITY", "water");
+  component.append(cardTitle);
+}
+function populateVisibility(data, component) {
+  const vis = data.currentCond.visibility;
+  const cardTitle = createCardTitle("VISIBILITY", "visibility");
+  component.append(cardTitle);
+}
+function populatePrecip(data, component) {
+  const precip = data.next10days.filter((entry) => {
+    return entry.dayOfWeek === "Today";
+  })[0].precip;
+  const cardTitle = createCardTitle("PRECIPITATION", "water_drop");
+  component.append(cardTitle);
+}
+
+function populateSunset(data, component) {
+  const sunset = data.currentCond.sunset;
+  const sunrise = data.currentCond.sunrise;
+  const cardTitle = createCardTitle("SUNSET", "wb_twilight");
+  component.append(cardTitle);
+}
+
+function populateWind(data, component) {
+  const winddir = data.currentCond.winddir;
+  const windgust = data.currentCond.windguest;
+  const windspeed = data.currentCond.windspeed;
+  const cardTitle = createCardTitle("WIND", "air");
+  component.append(cardTitle);
+}
+
+function populateUvDiv(data, component) {
+  const uv = data.uvindex;
+  const cardTitle = createCardTitle("UV INDEX", "wb_sunny");
+  component.append(cardTitle);
+}
+
+function populateFeelsLike(data, component) {
+  console.log(data);
+  const feelsLike = data.feelsLike;
+  const cardTitle = createCardTitle("FEELS LIKE", "thermostat");
+  component.append(cardTitle);
+}
 
 function populateAirQuality(data, component) {
   const aq = data.airQuality;
@@ -127,9 +189,8 @@ function populateAirQuality(data, component) {
   aqConcernDiv.textContent = aqConcern;
   const aqBar = div("aq-bar");
   const aqDot = div("aq-dot");
-  const aqDotPos = ((aq - 0) / (301 - 0)) * 330;
-  console.log(aqDotPos);
-  aqDot.style.left = `${aqDotPos}px`;
+  const aqDotPos = ((aq - 0) / (301 - 0)) * 100;
+  aqDot.style.left = `${aqDotPos}%`;
   aqBar.append(aqDot);
   const aqDescDiv = div("aq-desc");
   aqDescDiv.textContent = aqDesc;
@@ -380,6 +441,8 @@ function aggregateData(weatherData, summaryData) {
   const description = weatherData.description;
   const airQuality = weatherData.currentConditions.aqius;
   const timezone = weatherData.timezone;
+  const uvindex = weatherData.currentConditions.uvindex;
+  const currentCond = weatherData.currentConditions;
   // const timezone = "America/Los_Angeles";
 
   const days = weatherData.days;
@@ -401,7 +464,8 @@ function aggregateData(weatherData, summaryData) {
       const low = Math.round(day.tempmin);
       const high = Math.round(day.tempmax);
       const precipprob = Math.round(day.precipprob);
-      return { dayOfWeek, condition, low, high, precipprob };
+      const precip = day.precip;
+      return { dayOfWeek, condition, low, high, precipprob, precip };
     });
 
   const nowHour = format(
@@ -489,6 +553,8 @@ function aggregateData(weatherData, summaryData) {
     next24hrs,
     description,
     airQuality,
+    uvindex,
+    currentCond,
   };
 }
 
