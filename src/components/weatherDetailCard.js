@@ -19,6 +19,7 @@ import sunrise from "../assets/icons/sunrise.png";
 import sunset from "../assets/icons/sunset.png";
 import thunderstorm from "../assets/icons/thunderstorm.png";
 import windy from "../assets/icons/windy.png";
+import { div } from "../domStruct/newDomStructs";
 
 export const weatherDetailCard = function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
@@ -67,6 +68,19 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   const tenDayForcastWrap = component.querySelector(".forcast-10days");
   populateTenDay(data, tenDayForcastWrap);
 
+  // air quality
+  const airQualityDiv = component.querySelector(".air-quality");
+  populateAirQuality(data, airQualityDiv);
+
+  // feels-like
+  // uv-index
+  // wind
+  // sunset
+  // precipitation
+  // visibility
+  // humidity
+  // moon-phase
+
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
@@ -76,18 +90,71 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   return component;
 };
 
-function populateTenDay(data, component) {
+function populateAirQuality(data, component) {
+  const aq = data.airQuality;
+  let aqConcern, aqDesc;
+  if (aq <= 50) {
+    aqConcern = "Good";
+    aqDesc =
+      "Air quality is satisfactory, and air pollution poses little or no risk.";
+  } else if (aq >= 51 && aq <= 100) {
+    aqConcern = "Moderate";
+    aqDesc =
+      "Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.";
+  } else if (aq >= 101 && aq <= 150) {
+    aqConcern = "Unhealthy for Sensitive Groups";
+    aqDesc =
+      "Members of sensitive groups may experience health effects. The general public is less likely to be affected.";
+  } else if (aq >= 151 && aq <= 200) {
+    aqConcern = "Unhealthy";
+    aqDesc =
+      "Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects.";
+  } else if (aq >= 201 && aq <= 300) {
+    aqConcern = "Very Unhealthy";
+    aqDesc =
+      "Health alert: The risk of health effects is increased for everyone.";
+  } else {
+    aqConcern = "Hazardous";
+    aqDesc =
+      "Health warning of emergency conditions: everyone is more likely to be affected.";
+  }
+
+  const cardTitle = createCardTitle("AIR QUALITY", "blur_on");
+  const cardContent = div("aq-content");
+  const aqNum = div("aq-num");
+  aqNum.textContent = aq;
+  const aqConcernDiv = div("aq-concern");
+  aqConcernDiv.textContent = aqConcern;
+  const aqBar = div("aq-bar");
+  const aqDot = div("aq-dot");
+  const aqDotPos = ((aq - 0) / (301 - 0)) * 330;
+  console.log(aqDotPos);
+  aqDot.style.left = `${aqDotPos}px`;
+  aqBar.append(aqDot);
+  const aqDescDiv = div("aq-desc");
+  aqDescDiv.textContent = aqDesc;
+  cardContent.append(aqNum, aqConcernDiv, aqBar, aqDescDiv);
+
+  component.append(cardTitle, cardContent);
+}
+
+function createCardTitle(title, symbol) {
   const cardTitle = document.createElement("div");
   cardTitle.classList.add("card-title");
   const titleP = document.createElement("p");
   const cardIcon = document.createElement("span");
   cardIcon.classList.add("material-symbols-outlined", "card-title-symbol");
-  cardIcon.textContent = "calendar_month";
-  titleP.textContent = "10-DAY FORECAST";
+  cardIcon.textContent = symbol;
+  titleP.textContent = title;
   cardTitle.append(cardIcon, titleP);
+  return cardTitle;
+}
+
+function populateTenDay(data, component) {
+  const cardTitle = createCardTitle("10-DAY FORECAST", "calendar_month");
 
   const cardContent = document.createElement("div");
-  cardContent.classList.add("ten-days-content");
+
   const tenDaysData = data.next10days;
   const tenDaysLow = Math.min(...tenDaysData.map((data) => data.low));
   const tenDaysHigh = Math.max(...tenDaysData.map((data) => data.high));
