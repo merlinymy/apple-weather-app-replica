@@ -23,7 +23,7 @@ import compass from "../assets/sprites/compassRose.png";
 import { div } from "../domStruct/newDomStructs";
 import { Application } from "pixi.js";
 
-export const weatherDetailCard = async function (weatherData, summaryData) {
+export const weatherDetailCard = function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
   const struct = `
   <div class="card-animation">
@@ -49,13 +49,10 @@ export const weatherDetailCard = async function (weatherData, summaryData) {
     </div>
     <div class="forcast-10days long-card"></div>
     <div class="air-quality long-card"></div>
-    <div class="feels-like short-card"></div>
     <div class="uv-index short-card"></div>
-    <div class="wind short-card"></div>
     <div class="sunset short-card" id="sunset-card"></div>
-    <div class="precipitation short-card"></div>
-    <div class="visibility short-card"></div>
-    <div class="humidity short-card"></div>
+    <div class="feels-like short-card"></div>
+    <div class="wind short-card"></div>
 </div>`;
   const component = document.createElement("div");
   component.innerHTML = struct;
@@ -87,17 +84,7 @@ export const weatherDetailCard = async function (weatherData, summaryData) {
   populateWind(data, windDiv);
   // sunset
   const sunsetDiv = component.querySelector(".sunset");
-  await populateSunset(data, sunsetDiv);
-  // precipitation
-
-  const precipitationDiv = component.querySelector(".precipitation");
-  populatePrecip(data, precipitationDiv);
-  // visibility
-  const visibilityDiv = component.querySelector(".visibility");
-  populateVisibility(data, visibilityDiv);
-  // humidity
-  const humidityDiv = component.querySelector(".humidity");
-  populateHumidity(data, humidityDiv);
+  populateSunset(data, sunsetDiv);
 
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
@@ -108,25 +95,7 @@ export const weatherDetailCard = async function (weatherData, summaryData) {
   return component;
 };
 
-function populateHumidity(data, component) {
-  const vis = data.currentCond.humidity;
-  const cardTitle = createCardTitle("HUMIDITY", "water");
-  component.append(cardTitle);
-}
-function populateVisibility(data, component) {
-  const vis = data.currentCond.visibility;
-  const cardTitle = createCardTitle("VISIBILITY", "visibility");
-  component.append(cardTitle);
-}
-function populatePrecip(data, component) {
-  const precip = data.next10days.filter((entry) => {
-    return entry.dayOfWeek === "Today";
-  })[0].precip;
-  const cardTitle = createCardTitle("PRECIPITATION", "water_drop");
-  component.append(cardTitle);
-}
-
-async function populateSunset(data, component) {
+function populateSunset(data, component) {
   const midnight = `2025-01-01 00:00:00`;
   const midnight2 = `2025-01-02 00:00:00`;
   const sst = `2025-01-01 ${data.currentCond.sunset}`;
@@ -222,7 +191,7 @@ function sunCanvas(sst, srt, ctime, midnight, midnight2) {
     ctx.lineTo(x, y);
   }
   ctx.lineWidth = 4;
-  ctx.strokeStyle = "#ffffff";
+  ctx.strokeStyle = "rgba(233, 233, 233, 0.78)";
   ctx.stroke();
   ctx.beginPath();
   ctx.arc(
@@ -259,7 +228,7 @@ function sunCanvas(sst, srt, ctime, midnight, midnight2) {
   }
   ctx.filter = "invert(1)";
   ctx.lineWidth = 4;
-  ctx.strokeStyle = "#cacaca";
+  ctx.strokeStyle = "rgba(225,225,225,0.4)";
   ctx.stroke();
 
   ctx.beginPath();
@@ -542,7 +511,7 @@ function populateTenDay(data, component) {
       const currentTempDot = document.createElement("div");
       currentTempDot.classList.add("current-temp-dot");
       const currentTempDotPos =
-        ((data.currentTemp - tenDaysLow) / (tenDaysHigh - tenDaysLow)) * 100;
+        ((data.currentTemp - tenDaysLow) / (tenDaysHigh - tenDaysLow)) * 95;
       currentTempDot.style.left = `${currentTempDotPos}px`;
       tempBar10.append(currentTempDot);
     }

@@ -24,7 +24,7 @@ const summaryData = await filterDataForSummaryCards(
   userLocationLatLon,
 );
 if (userLocationLatLon) {
-  await createWeatherCard(weatherData, summaryData);
+  createWeatherCard(weatherData, summaryData);
   startWeatherUpdates(userLocationLatLon, "us", true);
   hideMessage("no-content-msg");
 } else if (!userLocationLatLon && !document.querySelectorAll(".summary-card")) {
