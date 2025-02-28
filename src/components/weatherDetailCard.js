@@ -19,9 +19,11 @@ import sunrise from "../assets/icons/sunrise.png";
 import sunset from "../assets/icons/sunset.png";
 import thunderstorm from "../assets/icons/thunderstorm.png";
 import windy from "../assets/icons/windy.png";
+import compass from "../assets/sprites/compassRose.png";
 import { div } from "../domStruct/newDomStructs";
+import { Application } from "pixi.js";
 
-export const weatherDetailCard = function (weatherData, summaryData) {
+export const weatherDetailCard = async function (weatherData, summaryData) {
   const data = aggregateData(weatherData, summaryData);
   const struct = `
   <div class="card-animation">
@@ -49,8 +51,8 @@ export const weatherDetailCard = function (weatherData, summaryData) {
     <div class="air-quality long-card"></div>
     <div class="feels-like short-card"></div>
     <div class="uv-index short-card"></div>
-    <div class="wind long-card"></div>
-    <div class="sunset short-card"></div>
+    <div class="wind short-card"></div>
+    <div class="sunset short-card" id="sunset-card"></div>
     <div class="precipitation short-card"></div>
     <div class="visibility short-card"></div>
     <div class="humidity short-card"></div>
@@ -85,7 +87,7 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   populateWind(data, windDiv);
   // sunset
   const sunsetDiv = component.querySelector(".sunset");
-  populateSunset(data, sunsetDiv);
+  await populateSunset(data, sunsetDiv);
   // precipitation
 
   const precipitationDiv = component.querySelector(".precipitation");
@@ -124,32 +126,291 @@ function populatePrecip(data, component) {
   component.append(cardTitle);
 }
 
-function populateSunset(data, component) {
-  const sunset = data.currentCond.sunset;
-  const sunrise = data.currentCond.sunrise;
+async function populateSunset(data, component) {
+  const midnight = `2025-01-01 00:00:00`;
+  const midnight2 = `2025-01-02 00:00:00`;
+  const sst = `2025-01-01 ${data.currentCond.sunset}`;
+  const srt = `2025-01-01 ${data.currentCond.sunrise}`;
+  // const ctime = "2025-01-01 03:00:00";
+  const ctime = `2025-01-01 ${data.currentCond.datetime}`;
+
+  const sunset = format(sst, "h:ma");
+  const sunrise = format(srt, "h:ma");
+  const sunriseTimeDiv = div("sunrise-time");
+  const sunriseTime = document.createElement("p");
+  const sunriseAmPmSpan = document.createElement("span");
+  sunriseAmPmSpan.classList.add("ampm");
+  sunriseAmPmSpan.textContent = sunrise.slice(-2);
+  sunriseTime.textContent = `Sunrise: ${sunrise.slice(0, -2)}`;
+  sunriseTimeDiv.append(sunriseTime, sunriseAmPmSpan);
+
+  const sunsetTimeDiv = div("sunset-time");
+  const sunsetTime = document.createElement("p");
+  const sunsetAmPmSpan = document.createElement("span");
+  sunsetAmPmSpan.classList.add("ampm");
+  sunsetAmPmSpan.textContent = sunset.slice(-2);
+  sunsetTime.textContent = sunset.slice(0, -2);
+  sunsetTimeDiv.append(sunsetTime, sunsetAmPmSpan);
+
+  const canvasWrapper = div("canvas-wrap");
+  canvasWrapper.style.width = "100%";
+  canvasWrapper.style.height = "60%";
+
+  const cardContent = div("sunset-content");
+  const canvas = sunCanvas(sst, srt, ctime, midnight, midnight2);
+  canvasWrapper.append(canvas);
+  cardContent.append(sunsetTimeDiv, canvasWrapper, sunriseTimeDiv);
+
   const cardTitle = createCardTitle("SUNSET", "wb_twilight");
-  component.append(cardTitle);
+  component.append(cardTitle, cardContent);
+}
+
+function sunCanvas(sst, srt, ctime, midnight, midnight2) {
+  const sunCanvas = document.createElement("canvas");
+
+  sunCanvas.style.width = "100%";
+  sunCanvas.style.height = "100%";
+
+  const ctx = sunCanvas.getContext("2d");
+  const h = sunCanvas.height;
+  const w = sunCanvas.width;
+  const horiLineY = h * 0.5;
+  const waveHeight = 30;
+  const shiftPixels = 70;
+  let sunXBeforeRise, sunXDay, sunXAfterSet;
+  // draw the sun
+  let [sunriseX, sunsetX] = findIntersections(shiftPixels, w);
+  let xRange, sunX;
+  if (ctime >= midnight && ctime < srt) {
+    xRange = sunriseX - 0;
+    sunX =
+      ((Date.parse(ctime) - Date.parse(midnight)) /
+        (Date.parse(srt) - Date.parse(midnight))) *
+      xRange;
+  } else if (ctime > srt && ctime < sst) {
+    xRange = sunsetX - sunriseX;
+    // console.log(Date.parse(ctime));
+    sunX =
+      ((Date.parse(ctime) - Date.parse(srt)) /
+        (Date.parse(sst) - Date.parse(srt))) *
+        xRange +
+      sunriseX;
+  } else if (ctime > sst && ctime <= midnight2) {
+    xRange = w - sunsetX;
+    sunX =
+      ((Date.parse(ctime) - Date.parse(sst)) /
+        (Date.parse(midnight2) - Date.parse(sst))) *
+        xRange +
+      sunsetX;
+  } else if (ctime === srt) {
+    sunX = sunriseX;
+  } else if (ctime === sst) {
+    sunX = sunsetX;
+  }
+
+  // clip the top to draw day curve
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, w, horiLineY);
+  ctx.clip();
+
+  // draw day curve
+  ctx.beginPath();
+  ctx.moveTo(0, waveY(0));
+  for (let x = 0; x <= w; x++) {
+    const y = waveY(horiLineY, waveHeight, x, shiftPixels, w);
+    ctx.lineTo(x, y);
+  }
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "#ffffff";
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(
+    sunX,
+    waveY(horiLineY, waveHeight, sunX, shiftPixels, w),
+    9,
+    0,
+    2 * Math.PI,
+  );
+
+  ctx.shadowColor = "#ffffff";
+  ctx.shadowBlur = 15;
+  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = "1";
+  ctx.fill();
+  ctx.stroke();
+
+  // restore canvas to before clipping
+  ctx.restore();
+
+  // bottom night curve
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, horiLineY, w, horiLineY);
+  ctx.clip();
+
+  //draw night curve
+  ctx.beginPath();
+  ctx.moveTo(0, waveY(0));
+  for (let x = 0; x <= w; x++) {
+    const y = waveY(horiLineY, waveHeight, x, shiftPixels, w);
+    ctx.lineTo(x, y);
+  }
+  ctx.filter = "invert(1)";
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "#cacaca";
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(
+    sunX,
+    waveY(horiLineY, waveHeight, sunX, shiftPixels, w),
+    9,
+    0,
+    2 * Math.PI,
+  );
+  ctx.fillStyle = "#ffffff";
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = "1";
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.restore();
+
+  // draw center line
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  ctx.moveTo(0, horiLineY);
+  ctx.lineTo(w, horiLineY);
+  ctx.stroke();
+  // console.log(sunX, waveY(horiLineY, waveHeight, sunX, shiftPixels, w));
+  ctx.beginPath();
+  // ctx.moveTo(sunX, horiLineY);
+
+  // ctx.stroke();
+
+  // drawOnSunCanvas(sunCanvas);
+  return sunCanvas;
+}
+// AI generated math for drawing sun
+// I don't like math...
+function waveY(lineY, waveHeight, x, shiftPixels, w) {
+  return lineY - waveHeight * Math.sin((2 * Math.PI * (x - shiftPixels)) / w);
+}
+
+// more math
+function findIntersections(shiftPixels, w) {
+  // We know x = shiftPixels + n*(w/2) and want 0 <= x <= w
+  const intersections = [];
+  // Choose a small range of n that covers at least [0, w].
+  // For most typical uses, n in [-2..2] is enough to catch
+  // all intersections within a single period from 0..w:
+  for (let n = -2; n <= 2; n++) {
+    const xCandidate = shiftPixels + n * (w / 2);
+    if (0 <= xCandidate && xCandidate <= w) {
+      intersections.push(xCandidate);
+    }
+  }
+
+  // Sort them in ascending order:
+  intersections.sort((a, b) => a - b);
+
+  return intersections; // e.g. [x1, x2] or more, depending on wave position
 }
 
 function populateWind(data, component) {
   const winddir = data.currentCond.winddir;
-  const windgust = data.currentCond.windguest;
-  const windspeed = data.currentCond.windspeed;
+  const windgust = Math.round(data.currentCond.windgust);
+  const windspeed = Math.round(data.currentCond.windspeed);
+
   const cardTitle = createCardTitle("WIND", "air");
-  component.append(cardTitle);
+  const cardContent = div("wind-content");
+  const windInfo = div("wind-info");
+  const windDiv = div("wind-speed");
+  const windDivName = div("wind-div-name");
+  const windDivVal = div("wind-div-val");
+  windDivName.textContent = "Wind";
+  windDivVal.textContent = `${windspeed} mph`;
+  windDiv.append(windDivName, windDivVal);
+  const gustsDiv = div("gusts");
+  const gustsDivName = div("gusts-div-name");
+  const gustsDivVal = div("gusts-div-val");
+  gustsDivName.textContent = "Gusts";
+  gustsDivVal.textContent = `${windgust} mph`;
+  gustsDiv.append(gustsDivName, gustsDivVal);
+  const dirDiv = div("direction");
+  const dirDivName = div("direction-div-name");
+  const dirDivVal = div("direction-div-val");
+  dirDivName.textContent = "Direction";
+  dirDivVal.textContent = `${winddir}\u00B0 ${getWindDirection(winddir)}`;
+  dirDiv.append(dirDivName, dirDivVal);
+
+  windInfo.append(windDiv, gustsDiv, dirDiv);
+
+  cardContent.append(windInfo);
+
+  component.append(cardTitle, cardContent);
 }
 
 function populateUvDiv(data, component) {
   const uv = data.uvindex;
+  let category;
+  if (uv <= 2) {
+    category = "Low";
+  } else if (uv >= 3 && uv <= 5) {
+    category = "Moderate";
+  } else if (uv >= 6 && uv <= 7) {
+    category = "High";
+  } else if (uv >= 8 && uv <= 10) {
+    category = "Very High";
+  } else {
+    category = "Extreme";
+  }
+  const uvNumDiv = div("uv-num");
+  uvNumDiv.textContent = uv;
+  const uvCat = div("uv-cat");
+  uvCat.textContent = category;
+  const uvBar = div("uv-bar");
+  const uvPoint = div("uv-dot");
+  uvBar.append(uvPoint);
+  const uvPointPos = ((uv - 0) / (12 - 0)) * 100;
+  uvPoint.style.left = `${uvPointPos}%`;
+
+  const uvDesc = div("uv-desc");
+  const uvDescArr = [
+    "Limit your time in the sun between 10:00 a.m. and 4:00 p.m.",
+    `Use sun protection until ${format(`2015-1-1 ${data.currentCond.sunset}`, "ha")}`,
+  ];
+  uvDesc.textContent = uvDescArr[Math.floor(Math.random() * (1 - 0 + 1) + 0)];
   const cardTitle = createCardTitle("UV INDEX", "wb_sunny");
-  component.append(cardTitle);
+  const cardContent = div("uv-content");
+  cardContent.append(uvNumDiv, uvCat, uvBar, uvDesc);
+  component.append(cardTitle, cardContent);
 }
 
 function populateFeelsLike(data, component) {
   console.log(data);
   const feelsLike = data.feelsLike;
+  const curTemp = data.currentTemp;
   const cardTitle = createCardTitle("FEELS LIKE", "thermostat");
-  component.append(cardTitle);
+  // const cardContent = div("feelslike-content");
+  const feelsLikeDiv = div("feelslike-num");
+  feelsLikeDiv.textContent = `${feelsLike}\u00B0`;
+  const feelsLikeDescDiv = div("feelslike-desc");
+  if (feelsLike < curTemp) {
+    feelsLikeDescDiv.textContent = "Wind is making it feel colder.";
+  } else if (feelsLike > curTemp) {
+    feelsLikeDescDiv.textContent =
+      "It feels warmer than the actual temperature.";
+  } else {
+    feelsLikeDescDiv.textContent = "Similar to the actual temperature.";
+  }
+
+  // cardContent.append();
+
+  component.append(cardTitle, feelsLikeDiv, feelsLikeDescDiv);
 }
 
 function populateAirQuality(data, component) {
@@ -622,4 +883,33 @@ function categorize(apiCondition) {
 
   // Default to 'Cloudy' if condition not found
   return conditionMapping[primaryCondition] || "clear";
+}
+
+function getWindDirection(degrees) {
+  const directions = [
+    { angle: 0, name: "N" },
+    { angle: 22.5, name: "NNE" },
+    { angle: 45, name: "NE" },
+    { angle: 67.5, name: "ENE" },
+    { angle: 90, name: "E" },
+    { angle: 112.5, name: "ESE" },
+    { angle: 135, name: "SE" },
+    { angle: 157.5, name: "SSE" },
+    { angle: 180, name: "S" },
+    { angle: 202.5, name: "SSW" },
+    { angle: 225, name: "SW" },
+    { angle: 247.5, name: "WSW" },
+    { angle: 270, name: "W" },
+    { angle: 292.5, name: "WNW" },
+    { angle: 315, name: "NW" },
+    { angle: 337.5, name: "NNW" },
+    { angle: 360, name: "N" }, // 360° wraps back to North
+  ];
+
+  // Find the closest direction
+  return directions.reduce((closest, dir) =>
+    Math.abs(degrees - dir.angle) < Math.abs(degrees - closest.angle)
+      ? dir
+      : closest,
+  ).name;
 }

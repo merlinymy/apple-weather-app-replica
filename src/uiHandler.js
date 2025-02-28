@@ -2,13 +2,13 @@ import { newSummaryCardComponent } from "./components/summaryCard";
 import { filterDataForSummaryCards } from "./data/dataHandler";
 import { weatherDetailCard } from "./components/weatherDetailCard";
 
-export const createWeatherCard = function (
+export const createWeatherCard = async function (
   weatherData,
   summaryData,
   divCenter,
 ) {
   const mainContent = document.querySelector(".main-content");
-  const component = weatherDetailCard(weatherData, summaryData);
+  const component = await weatherDetailCard(weatherData, summaryData);
   mainContent.append(component);
 };
 
