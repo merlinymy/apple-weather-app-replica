@@ -89,7 +89,7 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
-      setAnimation(animationCanvas, summaryData);
+    setAnimation(animationCanvas, summaryData);
   }, 0);
 
   return component;
@@ -348,11 +348,8 @@ function populateUvDiv(data, component) {
   uvPoint.style.left = `${uvPointPos}%`;
 
   const uvDesc = div("uv-desc");
-  const uvDescArr = [
-    "Limit your time in the sun between 10:00 a.m. and 4:00 p.m.",
-    `Use sun protection until ${format(`2015-1-1 ${data.currentCond.sunset}`, "ha")}`,
-  ];
-  uvDesc.textContent = uvDescArr[Math.floor(Math.random() * (1 - 0 + 1) + 0)];
+  uvDesc.textContent =
+    "Limit your time in the sun between 10:00 a.m. and 4:00 p.m.";
   const cardTitle = createCardTitle("UV INDEX", "wb_sunny");
   const cardContent = div("uv-content");
   cardContent.append(uvNumDiv, uvCat, uvBar, uvDesc);
