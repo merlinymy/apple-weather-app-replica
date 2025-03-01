@@ -89,7 +89,7 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
-    setAnimation(animationCanvas, summaryData);
+      setAnimation(animationCanvas, summaryData);
   }, 0);
 
   return component;
