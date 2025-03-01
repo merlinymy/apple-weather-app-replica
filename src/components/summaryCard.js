@@ -29,7 +29,7 @@ export const newSummaryCardComponent = async function (weatherData, query) {
   `;
 
   const component = document.createElement("div");
-  component.classList.add(`${summaryData.location}`, "summary-card");
+  component.classList.add("summary-card");
   component.innerHTML = struct;
   const timeDiv = component.querySelector(".time");
   updateTime(timeDiv, summaryData.timezone);
