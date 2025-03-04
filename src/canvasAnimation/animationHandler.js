@@ -2,61 +2,32 @@ import { Application, Assets, Sprite } from "pixi.js";
 import sun from "../assets/sprites/sun.png";
 import moon from "../assets/sprites/moon.png";
 import sun_orb from "../assets/sprites/sun_orb.png";
-import { convertToDate, getTimeFromTimezone } from "../util";
+import {
+  convertToDate,
+  getTimeFromTimezone,
+  setBackgroundColor,
+} from "../util";
 
 export const setAnimation = async function (div, weatherData) {
+  console.log(weatherData);
   const timezone = weatherData.timezone;
-  const time = getTimeFromTimezone(getTimeFromTimezone);
+  const time = getTimeFromTimezone(timezone);
+  console.log(time);
   const currentConditions = weatherData.currentConditions;
-  //   const
+
   const app = new Application();
   const cardContent = div.nextElementSibling;
   await app.init({
     resizeTo: cardContent,
   });
-  setBackgroundColor(app, time, currentConditions);
-  // setSunMoonPosition(app, time);
+  const baseColor = setBackgroundColor(time, currentConditions);
+  app.renderer.background.color = baseColor;
+  // setBodyBackgroundColor(baseColor);
+
+  setSunMoonPosition(app, time);
   setClouds(app, currentConditions);
   //   puffyCloud(app);
   div.appendChild(app.canvas);
-};
-
-const setBackgroundColor = function (app, time, currentConditions) {
-  const curTime = convertToDate(time);
-  const sunriseTime = convertToDate("7:00 AM");
-  const sunsetTime = convertToDate("7:00 PM");
-  const condition = currentConditions.toLowerCase();
-
-  let baseColor;
-
-  if (curTime >= sunriseTime && curTime <= sunsetTime) {
-    baseColor = "#87CEEB"; // Daytime sky (light blue)
-    if (condition.includes("clear")) {
-      baseColor = baseColor; // No change, sky remains as per time
-    } else if (condition.includes("partially cloudy")) {
-      baseColor = "#A0C4FF"; // Light blue with a subtle cloudy tint
-    } else if (condition.includes("overcast") || condition.includes("fog")) {
-      baseColor = "#A9A9A9"; // Grayish sky for cloudy/overcast conditions
-    } else if (condition.includes("rain") || condition.includes("drizzle")) {
-      baseColor = "#708090"; // Grayish blue for rainy weather
-    } else if (condition.includes("thunderstorm")) {
-      baseColor = "#4B0082"; // Deep purple for stormy atmosphere
-    } else if (condition.includes("snow")) {
-      baseColor = "#DDEEFF"; // Very light blue to reflect snowy brightness
-    }
-    if (
-      curTime < convertToDate("8:00 AM") ||
-      curTime > convertToDate("5:00 PM")
-    ) {
-      baseColor = "#c0b9ff"; // Soft peach near sunrise/sunset
-    }
-  } else {
-    baseColor = "#1B263B"; // Deep blue night sky
-  }
-  setBodyBackgroundColor(baseColor);
-
-  // Apply the background color
-  app.renderer.background.color = baseColor;
 };
 
 function setBodyBackgroundColor(baseColor) {

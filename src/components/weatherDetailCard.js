@@ -22,9 +22,17 @@ import windy from "../assets/icons/windy.png";
 import compass from "../assets/sprites/compassRose.png";
 import { div } from "../domStruct/newDomStructs";
 import { Application } from "pixi.js";
+import { setBackgroundColor, getTimeFromTimezone } from "../util";
 
-export const weatherDetailCard = function (weatherData, summaryData) {
+export const weatherDetailCard = function (
+  weatherData,
+  summaryData,
+  divCenter,
+) {
   const data = aggregateData(weatherData, summaryData);
+  const timezone = weatherData.timezone;
+  const time = getTimeFromTimezone(timezone);
+  const currentConditions = weatherData.currentConditions.conditions;
   const struct = `
   <div class="card-animation">
   </div>
@@ -53,7 +61,18 @@ export const weatherDetailCard = function (weatherData, summaryData) {
     <div class="sunset short-card" id="sunset-card"></div>
     <div class="feels-like short-card"></div>
     <div class="wind short-card"></div>
-</div>`;
+</div>
+<div class="btm-tool-bar">
+  <div class="nav-sec">
+
+  </div>
+  <div class="list-icon">
+    <span class="material-symbols-outlined">
+      list
+    </span>
+  </div>
+</div>
+`;
   const component = document.createElement("div");
   component.innerHTML = struct;
   component.classList.add("detailcard");
@@ -91,6 +110,28 @@ export const weatherDetailCard = function (weatherData, summaryData) {
   setTimeout(() => {
     setAnimation(animationCanvas, summaryData);
   }, 0);
+
+  const mainContent = document.querySelector(".main-content");
+  mainContent.style.backgroundColor = setBackgroundColor(
+    time,
+    currentConditions,
+  );
+  const btmToolBar = component.querySelector(".btm-tool-bar");
+  btmToolBar.style.backgroundColor = setBackgroundColor(
+    time,
+    currentConditions,
+  );
+
+  const listIcon = component.querySelector(".list-icon");
+  listIcon.addEventListener("click", () => {
+    mainContent.style.height = `0px`;
+    mainContent.style.overflow = "hidden";
+    const wrap = document.querySelector(".wrap");
+    setTimeout(() => {
+      mainContent.innerHTML = "";
+    }, 100);
+    console.log("clicked");
+  });
 
   return component;
 };
@@ -760,7 +801,7 @@ function aggregateData(weatherData, summaryData) {
       if (idx === 0) {
         time = "Now";
       } else {
-        time = format(data.datetime, "ha");
+        time = format(time, "ha");
       }
       const condition = data.conditions;
       const temp = Math.round(data.temp);
