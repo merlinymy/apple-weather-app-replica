@@ -22,12 +22,12 @@ import { div } from "./domStruct/newDomStructs";
 // const realData = await getData("san jose", "us");
 // const summaryData = await filterDataForSummaryCard(await realData.json());
 const userLocationLatLon = await askForGeolocation();
-const weatherResponse = await getResponseFromLatLon(userLocationLatLon, "us");
-const weatherData = await weatherResponse.json();
-const summaryData = await filterDataForSummaryCards(
-  weatherData,
-  userLocationLatLon,
-);
+// const weatherResponse = await getResponseFromLatLon(userLocationLatLon, "us");
+// const weatherData = await weatherResponse.json();
+// const summaryData = await filterDataForSummaryCards(
+//   weatherData,
+//   userLocationLatLon,
+// );
 
 if (userLocationLatLon) {
   // createWeatherCard(weatherData, summaryData);

@@ -34,7 +34,8 @@ export const startWeatherUpdates = async function (
       weatherData = JSON.parse(localStorage.getItem("weatherData"));
     } finally {
       if (weatherData) {
-        await updateSummaryCard(weatherData, query);
+        console.log(query);
+        await updateSummaryCard(weatherData, query, isTracked);
         hideMessage("no-content-msg");
       }
     }
@@ -103,7 +104,6 @@ export const filterDataForSummaryCards = async function (response, query) {
   const tempRes = response.days.find((day) => {
     return day.datetime === getCurrentDate(response.timezone);
   });
-  console.log(tempRes);
   const maxTemp = Math.round(
     response.days.find((day) => {
       return day.datetime === getCurrentDate(response.timezone);

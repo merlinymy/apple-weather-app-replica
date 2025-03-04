@@ -52,14 +52,15 @@ export const newSummaryCardComponent = async function (weatherData, query) {
     const summaryCardPos = getDivPos(cardContent);
 
     const mainContent = createWeatherCard(
-      weatherDataFromStorage,
+      weatherDataFromStorage || weatherData,
       summaryData,
       summaryCardPos,
     );
 
     mainContent.style.height = `100dvh`;
-    mainContent.style.overflow = "auto";
-    mainContent.style.transform = "translateX(-100%)";
+    mainContent.style.zIndex = "10";
+    // mainContent.style.overflow = "auto";
+    // mainContent.style.transform = "translateX(-100%)";
 
     // console.log(summaryCardPos.x, summaryCardPos.y);
     // mainContent.style.top = `${summaryCardPos.x}px`;

@@ -9,10 +9,8 @@ import {
 } from "../util";
 
 export const setAnimation = async function (div, weatherData) {
-  console.log(weatherData);
   const timezone = weatherData.timezone;
   const time = getTimeFromTimezone(timezone);
-  console.log(time);
   const currentConditions = weatherData.currentConditions;
 
   const app = new Application();

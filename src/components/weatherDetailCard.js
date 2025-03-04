@@ -702,6 +702,7 @@ function isIn10Days(today, in10Days, dateTocheck) {
 function aggregateData(weatherData, summaryData) {
   const location = summaryData.location;
   const currentTemp = summaryData.currentTemp;
+  console.log(weatherData);
   const feelsLike = Math.round(weatherData.currentConditions.feelslike);
   const high = summaryData.maxTemp;
   const low = summaryData.minTemp;

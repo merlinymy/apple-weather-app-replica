@@ -111,10 +111,13 @@ export const createWeatherCard = function (
   return mainContent;
 };
 
-export const updateSummaryCard = async function (weatherData, query) {
+export const updateSummaryCard = async function (
+  weatherData,
+  query,
+  isTracked,
+) {
   console.log(`working on ${query}`);
   const summaryData = await filterDataForSummaryCards(weatherData, query);
-  console.log(summaryData);
   const contentDiv = document.querySelector(".side-bar > .content");
   const existingCard = contentDiv.querySelector(
     `.${summaryData.location.replace(/[^a-zA-Z0-9]/g, "")}`,
@@ -135,9 +138,12 @@ export const updateSummaryCard = async function (weatherData, query) {
     existingCard.querySelector(".temp-low").textContent =
       `L: ${summaryData.minTemp}°`;
   } else {
-    console.log("No existing card found. Creating a new one...");
     const summaryCard = await newSummaryCardComponent(weatherData, query);
-    contentDiv.append(summaryCard);
+    if (isTracked) {
+      contentDiv.prepend(summaryCard);
+    } else {
+      contentDiv.append(summaryCard);
+    }
   }
 };
 
