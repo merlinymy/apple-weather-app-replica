@@ -1,17 +1,52 @@
 import { onGeolocationRefuse } from "./uiHandler";
 
-export const getDivCenter = function (div) {
+export const getDivPos = function (div) {
   const rect = div.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
+  const centerX = rect.left;
+  const centerY = rect.top;
 
   return { x: centerX, y: centerY };
 };
 
+export const setBackgroundColor = function (time, currentConditions) {
+  const curTime = convertToDate(time);
+  const sunriseTime = convertToDate("7:00 AM");
+  const sunsetTime = convertToDate("7:00 PM");
+  const condition = currentConditions.toLowerCase();
+
+  let baseColor;
+
+  if (curTime >= sunriseTime && curTime <= sunsetTime) {
+    baseColor = "#87CEEB"; // Daytime sky (light blue)
+    if (condition.includes("clear")) {
+      baseColor = baseColor; // No change, sky remains as per time
+    } else if (condition.includes("partially cloudy")) {
+      baseColor = "#A0C4FF"; // Light blue with a subtle cloudy tint
+    } else if (condition.includes("overcast") || condition.includes("fog")) {
+      baseColor = "#A9A9A9"; // Grayish sky for cloudy/overcast conditions
+    } else if (condition.includes("rain") || condition.includes("drizzle")) {
+      baseColor = "#708090"; // Grayish blue for rainy weather
+    } else if (condition.includes("thunderstorm")) {
+      baseColor = "#4B0082"; // Deep purple for stormy atmosphere
+    } else if (condition.includes("snow")) {
+      baseColor = "#DDEEFF"; // Very light blue to reflect snowy brightness
+    }
+    if (
+      curTime < convertToDate("8:00 AM") ||
+      curTime > convertToDate("5:00 PM")
+    ) {
+      baseColor = "#c0b9ff"; // Soft peach near sunrise/sunset
+    }
+  } else {
+    baseColor = "#1B263B"; // Deep blue night sky
+  }
+
+  return baseColor;
+};
+
 export const getTimeFromTimezone = function (tzString) {
-  // https://stackoverflow.com/questions/10087819/convert-date-to-another-timezone-in-javascript
   return new Intl.DateTimeFormat("en-US", {
-    tzString,
+    timeZone: tzString, // Correct property name
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
@@ -19,13 +54,14 @@ export const getTimeFromTimezone = function (tzString) {
 };
 
 export const updateTime = function (div, timezone) {
+  // console.log(getTimeFromTimezone(timezone));
   div.innerHTML = getTimeFromTimezone(timezone);
   setTimeout(() => updateTime(div, timezone), 1000);
 };
 
 export const getCurrentDate = function (tzString) {
   return new Intl.DateTimeFormat("en-CA", {
-    tzString,
+    timeZone: tzString,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
