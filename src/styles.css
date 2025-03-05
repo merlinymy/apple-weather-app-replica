@@ -74,15 +74,20 @@ dialog {
     transition: all 150ms;
     outline: none;
     border: none;
-    transform: translate(115%, 12%) scale(0);
+    transform: translate(105%, 15%) scale(0);
 }
 
+
+dialog[open]{
+    transform: translate(105%, 15%) scale(1);
+    transition: all 150ms;
+}
 
 dialog:open{
-    transform: translate(110%, 12%) scale(1);
+    transform: translate(105%, 15%) scale(1);
     transition: all 150ms;
-
 }
+
 
 .space-holder {
     height: 24px;
