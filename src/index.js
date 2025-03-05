@@ -31,7 +31,7 @@ celsiusDiv.addEventListener("click", (event) => {
   celsiusDiv.querySelector("span").classList.remove("transparent");
   fDiv.querySelector("span").classList.add("transparent");
   localStorage.setItem("tempUnit", "c");
-  if (tempUnit === "f") {
+  if (tempUnit === "f" || tempUnit === undefined) {
     convertTemp("c");
   }
   tempUnit = "c";
