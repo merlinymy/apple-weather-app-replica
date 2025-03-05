@@ -46,9 +46,6 @@ body {
     width: 100dvw;
 }
 
-.hidden {
-    display: none;
-}
 
 .side-bar {
     display: flex;
@@ -61,6 +58,88 @@ body {
     /* max-width: 300px; */
     background-color: rgb(0, 0, 0);
 }
+
+dialog {
+    position: absolute;
+    color: var(--white-transparent2);
+    z-index: 1000;
+    width: 200px;
+    background-color: rgb(32, 32, 32);
+    /* right: 0px; */
+    /* right: 500px; */
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-radius: 15px;
+    transition: all 150ms;
+    outline: none;
+    border: none;
+    transform: translate(115%, 12%) scale(0);
+}
+
+
+dialog:open{
+    transform: translate(110%, 12%) scale(1);
+    transition: all 150ms;
+
+}
+
+.space-holder {
+    height: 24px;
+    width: 24px;
+}
+
+.options-wrap {
+    width: 100dvw;
+    height: 100dvh;
+    position: absolute;
+}
+
+.options > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.5rem;
+    /* background-color: rgb(48, 48, 48); */
+}
+
+.options > div > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem;
+}
+
+.options > div:not(:last-child) {
+    border-bottom: 2px solid var(--border-style);
+}
+
+.check-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.celsius, .speed-units > div {
+    position: relative;
+}
+
+.celsius::after, .speed-units > div:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-bottom: 1px solid var(--border-style);
+}
+
+.open {
+    transform: scale(1) translate(-90%);
+    transition: all 150ms;
+}
+.transparent {
+    opacity: 0;
+}
+
 .main-content {
     position: absolute;
     top: 0%;
@@ -344,6 +423,7 @@ p.current-temp {
 }
 .menu-btn {
     align-self: flex-end;
+    position: relative;
 }
 
 #search {
@@ -708,6 +788,7 @@ p.current-temp {
     }
 }
 
-@media (min-width: 720px) {
-
+.hidden {
+    display: none;
 }
+

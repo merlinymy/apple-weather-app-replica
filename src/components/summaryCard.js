@@ -3,7 +3,7 @@ import {
   setAnimation,
   playExpandAnimation,
 } from "../canvasAnimation/animationHandler";
-import { getDivPos, updateTime } from "../util";
+import { converDetailWeatherTemp, getDivPos, updateTime } from "../util";
 import { filterDataForSummaryCards } from "../data/dataHandler";
 import { createWeatherCard } from "../uiHandler";
 
@@ -46,7 +46,12 @@ export const newSummaryCardComponent = async function (weatherData, query) {
     const sideBar = document.querySelector(".side-bar");
     const cardContent = document.querySelector(".card-content");
     const summaryCardPos = getDivPos(cardContent);
-    createWeatherCard(weatherData, summaryData, summaryCardPos);
+    const detailCard = createWeatherCard(
+      weatherData,
+      summaryData,
+      summaryCardPos,
+    );
+    // converDetailWeatherTemp(detailCard, localStorage.getItem("tempUnit"));
   });
   return component;
 };

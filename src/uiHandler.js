@@ -120,6 +120,7 @@ export const createWeatherCard = function (
   mainContent.append(component);
   const sideBar = document.querySelector(".side-bar");
   mainContent.style.zIndex = "10";
+  return component;
 };
 
 export const updateSummaryCard = async function (

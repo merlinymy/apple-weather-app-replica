@@ -8,6 +8,96 @@ export const getDivPos = function (div) {
   return { x: centerX, y: centerY };
 };
 
+export const converDetailWeatherTemp = function (component, unit) {
+  const currentTemp = component.querySelector(".current-temp");
+  const highTemp = component.querySelector("p.high");
+  const lowTemp = component.querySelector("p.low");
+  const hourlyTemps = component.querySelectorAll(
+    ".hourly-info p:nth-of-type(2)",
+  );
+  const tempRangeLows = component.querySelectorAll(".temp-range-low");
+  const tempRangeHighs = component.querySelectorAll(".temp-range-high");
+  const feelsLike = component.querySelector(".feelslike-num");
+  if (unit === "c") {
+    currentTemp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(currentTemp.textContent)))}\u00B0`;
+    highTemp.textContent = `H:${Math.round(fahrenheitToCelsius(parseFloat(highTemp.textContent.split(":")[1])))}\u00B0`;
+    lowTemp.textContent = `L:${Math.round(fahrenheitToCelsius(parseFloat(lowTemp.textContent.split(":")[1])))}\u00B0`;
+    hourlyTemps.forEach((temp) => {
+      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(hourlyTemps.textContent)))}\u00B0`;
+    });
+    tempRangeLows.forEach((temp) => {
+      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(tempRangeLows.textContent)))}\u00B0`;
+    });
+    tempRangeHighs.forEach((temp) => {
+      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(tempRangeHighs.textContent)))}\u00B0`;
+    });
+    feelsLike.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(feelsLike.textContent)))}\u00B0`;
+  } else {
+    currentTemp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(currentTemp.textContent)))}\u00B0`;
+    highTemp.textContent = `H:${Math.round(celsiusToFahrenheit(parseFloat(highTemp.textContent.split(":")[1])))}\u00B0`;
+    lowTemp.textContent = `L:${Math.round(celsiusToFahrenheit(parseFloat(lowTemp.textContent.split(":")[1])))}\u00B0`;
+    hourlyTemps.forEach((temp) => {
+      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(hourlyTemps.textContent)))}\u00B0`;
+    });
+    tempRangeLows.forEach((temp) => {
+      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(tempRangeLows.textContent)))}\u00B0`;
+    });
+    tempRangeHighs.forEach((temp) => {
+      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(tempRangeHighs.textContent)))}\u00B0`;
+    });
+    feelsLike.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(feelsLike.textContent)))}\u00B0`;
+  }
+};
+
+export const convertTemp = function (unit) {
+  const allTemps = document.querySelectorAll(".summary-card div[class*=temp]");
+  if (unit === "c") {
+    allTemps.forEach((temp) => {
+      if (temp.classList.contains("temp-wrap")) {
+        return;
+      } else if (temp.classList.contains("temp-high")) {
+        temp.textContent = `H:${Math.round(
+          fahrenheitToCelsius(parseFloat(temp.textContent.split(":")[1])),
+        )}\u00B0`;
+      } else if (temp.classList.contains("temp-low")) {
+        temp.textContent = `L:${Math.round(
+          fahrenheitToCelsius(parseFloat(temp.textContent.split(":")[1])),
+        )}\u00B0`;
+      } else {
+        temp.textContent = `${Math.round(
+          fahrenheitToCelsius(parseFloat(temp.textContent)),
+        )}\u00B0`;
+      }
+    });
+  } else {
+    allTemps.forEach((temp) => {
+      if (temp.classList.contains("temp-wrap")) {
+        return;
+      } else if (temp.classList.contains("temp-high")) {
+        temp.textContent = `H:${Math.round(
+          celsiusToFahrenheit(parseFloat(temp.textContent.split(":")[1])),
+        )}\u00B0`;
+      } else if (temp.classList.contains("temp-low")) {
+        temp.textContent = `L:${Math.round(
+          celsiusToFahrenheit(parseFloat(temp.textContent.split(":")[1])),
+        )}\u00B0`;
+      } else {
+        temp.textContent = `${Math.round(
+          celsiusToFahrenheit(parseFloat(temp.textContent)),
+        )}\u00B0`;
+      }
+    });
+  }
+};
+
+function celsiusToFahrenheit(celsius) {
+  return (celsius * 9) / 5 + 32;
+}
+
+function fahrenheitToCelsius(fahrenheit) {
+  return ((fahrenheit - 32) * 5) / 9;
+}
+
 export const setBackgroundColor = function (time, currentConditions) {
   const curTime = convertToDate(time);
   const sunriseTime = convertToDate("7:00 AM");
