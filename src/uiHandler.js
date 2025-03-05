@@ -20,7 +20,6 @@ export const appendSearchResults = function (results, unit) {
     resDiv.textContent = res.address_long;
     resultsDiv.append(resDiv);
     resDiv.addEventListener("click", async () => {
-      console.log(res.address_long);
       try {
         await startWeatherUpdates(res.address_long, unit, false, false);
       } catch (error) {
@@ -32,7 +31,6 @@ export const appendSearchResults = function (results, unit) {
             false,
           );
         } catch (error) {
-          console.log(error);
           alert("Area currently has no weather data");
         }
       }
@@ -71,7 +69,6 @@ export const initSearch = function (userLocationLatLon, unit) {
   });
   cancelIcon.addEventListener("mousedown", () => {
     searchInput.value = "";
-    console.log("clicked");
     searchInput.focus();
   });
   searchInput.addEventListener("focusin", () => {
@@ -101,7 +98,6 @@ export const initSearch = function (userLocationLatLon, unit) {
         return { address_long, lat, lon };
       });
       appendSearchResults(results, unit);
-      console.log(results);
     }
 
     if (inputStr.length === 0) {
@@ -130,10 +126,8 @@ export const updateSummaryCard = async function (
   query,
   isTracked,
 ) {
-  console.log(`working on ${query}`);
-  const summaryData = await filterDataForSummaryCards(weatherData, query);
   const contentDiv = document.querySelector(".side-bar > .content");
-
+  console.log(weatherData);
   const summaryCard = await newSummaryCardComponent(weatherData, query);
   if (isTracked) {
     contentDiv.prepend(summaryCard);

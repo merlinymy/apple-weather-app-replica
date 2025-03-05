@@ -18,7 +18,6 @@ export const startWeatherUpdates = async function (
   try {
     let weatherResponse, weatherData;
     if (isTracked) {
-      console.log(query);
       weatherResponse = await getResponseFromLatLon(query, unit);
       weatherData = await weatherResponse.json();
     } else {
@@ -27,10 +26,7 @@ export const startWeatherUpdates = async function (
         let localWeatherData;
         if (query.lat) {
           localWeatherData = localData[`${query.lat},${query.lon}`];
-          console.log(localWeatherData);
         } else {
-          console.log(localData[`${query}`]);
-
           localWeatherData = localData[`${query}`];
         }
         if (localWeatherData) {
@@ -38,19 +34,15 @@ export const startWeatherUpdates = async function (
           if (
             differenceInMinutes(new Date().getTime(), localData.lastUpdate) > 30
           ) {
-            console.log("get data from api");
-
+            console.log("get new data");
             weatherResponse = await getResponseFromName(query, unit);
             weatherData = await weatherResponse.json();
             updateWeatherData(query, weatherData);
           } else {
-            console.log("get data from local");
+            console.log("use local data");
             weatherData = JSON.parse(localWeatherData.data);
-            console.log(weatherData);
           }
         } else {
-          console.log("get data from api");
-
           if (query.lat) {
             weatherResponse = await getResponseFromLatLon(query, unit);
           } else {
@@ -74,12 +66,10 @@ const getPlaceAutoComplete = async function (input, lat, lon) {
   const api_key = "06eda13645be42749d5881d37cc7fe18";
   let url;
   if (lat && lon) {
-    console.log("lat lon exist");
     url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&lang=en&limit=10&bias=proximity:${lat},${lon}|countrycode:none&format=json&apiKey=${api_key}`;
   } else {
     url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&lang=en&limit=10&format=json&apiKey=${api_key}`;
   }
-  console.log(url);
   const response = await fetch(url);
   return response;
 };

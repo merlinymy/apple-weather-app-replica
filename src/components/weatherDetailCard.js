@@ -29,7 +29,12 @@ export const weatherDetailCard = function (
   summaryData,
   divCenter,
 ) {
+  console.log("before aggregation");
+  console.log(weatherData);
   const data = aggregateData(weatherData, summaryData);
+  console.log("after");
+  console.log(weatherData);
+
   const timezone = weatherData.timezone;
   const time = getTimeFromTimezone(timezone);
   const currentConditions = weatherData.currentConditions.conditions;
@@ -702,7 +707,6 @@ function isIn10Days(today, in10Days, dateTocheck) {
 function aggregateData(weatherData, summaryData) {
   const location = summaryData.location;
   const currentTemp = summaryData.currentTemp;
-  console.log(weatherData);
   const feelsLike = Math.round(weatherData.currentConditions.feelslike);
   const high = summaryData.maxTemp;
   const low = summaryData.minTemp;
@@ -713,11 +717,13 @@ function aggregateData(weatherData, summaryData) {
   const uvindex = weatherData.currentConditions.uvindex;
   const currentCond = weatherData.currentConditions;
   // const timezone = "America/Los_Angeles";
+  console.log(JSON.parse(localStorage.getItem("weatherData")));
 
-  const days = weatherData.days;
+  const days = structuredClone(weatherData.days);
 
   const today = format(TZDate.tz(timezone), "yyyy-MM-dd");
   const tenDaysFromToday = format(addDays(today, 10), "yyyy-MM-dd");
+  console.dir(`before operation ${weatherData}`);
   const next10days = days
     .filter((day) => {
       return isIn10Days(today, tenDaysFromToday, day.datetime);
@@ -810,6 +816,7 @@ function aggregateData(weatherData, summaryData) {
       const isSunRaise = data.isSunRaise;
       return { time, condition, temp, precipprob, isSunRaise };
     });
+  console.dir(`after operation ${weatherData}`);
 
   return {
     location,
