@@ -22,13 +22,13 @@ import windy from "../assets/icons/windy.png";
 import compass from "../assets/sprites/compassRose.png";
 import { div } from "../domStruct/newDomStructs";
 import { Application } from "pixi.js";
-import { setBackgroundColor, getTimeFromTimezone } from "../util";
+import {
+  setBackgroundColor,
+  getTimeFromTimezone,
+  converDetailWeatherTemp,
+} from "../util";
 
-export const weatherDetailCard = function (
-  weatherData,
-  summaryData,
-  divCenter,
-) {
+export const weatherDetailCard = function (weatherData, summaryData, tempUnit) {
   const data = aggregateData(weatherData, summaryData);
   const timezone = weatherData.timezone;
   const time = getTimeFromTimezone(timezone);
@@ -129,6 +129,11 @@ export const weatherDetailCard = function (
       mainContent.innerHTML = "";
     }, 100);
   });
+
+  if (!localStorage.getItem("weatherDetailTempUnit") === tempUnit) {
+    localStorage.setItem("weatherDetailTempUnit") === tempUnit;
+    converDetailWeatherTemp(component, tempUnit);
+  }
 
   return component;
 };

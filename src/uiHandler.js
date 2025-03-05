@@ -6,7 +6,8 @@ import {
 import { weatherDetailCard } from "./components/weatherDetailCard";
 import { div } from "./domStruct/newDomStructs";
 import { debouncePlaceAutoComplete } from "./data/dataHandler";
-export const appendSearchResults = function (results, unit) {
+import { convertTemp } from "./util";
+export const appendSearchResults = function (results, unit, tempUnit) {
   const searchInput = document.querySelector("#search");
   const searchBar = document.querySelector(".search-bar");
   const searchPage = document.querySelector(".search-page");
@@ -21,19 +22,30 @@ export const appendSearchResults = function (results, unit) {
     resultsDiv.append(resDiv);
     resDiv.addEventListener("click", async () => {
       try {
-        await startWeatherUpdates(res.address_long, unit, false, false);
+        console.log("address form");
+        await startWeatherUpdates(
+          res.address_long,
+          unit,
+          false,
+          false,
+          tempUnit,
+        );
       } catch (error) {
         try {
+          console.log("lat lon form");
+
           await startWeatherUpdates(
             { lat: res.lat, lon: res.lon },
             unit,
             true,
             false,
+            tempUnit,
           );
         } catch (error) {
           alert("Area currently has no weather data");
         }
       }
+      convertTemp(tempUnit);
       resultsDiv.innerHTML = "";
       searchBarWrap.style.display = "block";
       searchPage.style.height = "100%";
@@ -46,7 +58,7 @@ export const appendSearchResults = function (results, unit) {
     });
   });
 };
-export const initSearch = function (userLocationLatLon, unit) {
+export const initSearch = function (userLocationLatLon, unit, tempUnit) {
   const searchInput = document.querySelector("#search");
   const searchBar = document.querySelector(".search-bar");
   const cancelIcon = document.querySelector(".cancel-icon");
@@ -97,7 +109,7 @@ export const initSearch = function (userLocationLatLon, unit) {
         const lon = res.lon;
         return { address_long, lat, lon };
       });
-      appendSearchResults(results, unit);
+      appendSearchResults(results, unit, tempUnit);
     }
 
     if (inputStr.length === 0) {
@@ -114,9 +126,10 @@ export const createWeatherCard = function (
   weatherData,
   summaryData,
   divCenter,
+  tempUnit,
 ) {
   const mainContent = document.querySelector(".main-content");
-  const component = weatherDetailCard(weatherData, summaryData);
+  const component = weatherDetailCard(weatherData, summaryData, tempUnit);
   mainContent.append(component);
   const sideBar = document.querySelector(".side-bar");
   mainContent.style.zIndex = "10";
@@ -127,9 +140,14 @@ export const updateSummaryCard = async function (
   weatherData,
   query,
   isTracked,
+  tempUnit,
 ) {
   const contentDiv = document.querySelector(".side-bar > .content");
-  const summaryCard = await newSummaryCardComponent(weatherData, query);
+  const summaryCard = await newSummaryCardComponent(
+    weatherData,
+    query,
+    tempUnit,
+  );
   if (isTracked) {
     contentDiv.prepend(summaryCard);
   } else {

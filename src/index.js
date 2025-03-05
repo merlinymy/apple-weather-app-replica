@@ -1,94 +1,39 @@
 // import data from "./data/mock-data.json";
 import "./styles.css";
-import { askForGeolocation, convertTemp } from "./util";
+import { askForGeolocation, convertTemp, initOptions } from "./util";
 import { startWeatherUpdates } from "./data/dataHandler";
 import { hideMessage, showMessage, initSearch } from "./uiHandler";
+import { intervalWithOptions } from "date-fns/fp";
 
 const userLocationLatLon = await askForGeolocation();
 
-const optionBtn = document.querySelector(".pending-icon");
-const optionDiv = document.querySelector(".options");
-const celsiusDiv = document.querySelector(".celsius");
-const fDiv = document.querySelector(".fahrenheit");
-const mphDiv = document.querySelector(".mph");
-const meterphDiv = document.querySelector(".meter-per-h");
-const mps = document.querySelector(".meter-per-sec");
-let tempUnit, speedUnit;
-let prevTempUnit = "f";
-
-let isOptionOpen = false;
-optionBtn.addEventListener("click", () => {
-  optionDiv.showModal();
-});
-
-optionDiv.addEventListener("click", (event) => {
-  if (event.target === optionDiv) {
-    optionDiv.close();
-  }
-});
-
-celsiusDiv.addEventListener("click", (event) => {
-  celsiusDiv.querySelector("span").classList.remove("transparent");
-  fDiv.querySelector("span").classList.add("transparent");
-  localStorage.setItem("tempUnit", "c");
-  if (tempUnit === "f" || tempUnit === undefined) {
-    convertTemp("c");
-  }
-  tempUnit = "c";
-});
-
-fDiv.addEventListener("click", (event) => {
-  fDiv.querySelector("span").classList.remove("transparent");
-  celsiusDiv.querySelector("span").classList.add("transparent");
-  localStorage.setItem("tempUnit", "f");
-  if (tempUnit === "c") {
-    convertTemp("f");
-  }
-  tempUnit = "f";
-});
-
-mphDiv.addEventListener("click", (event) => {
-  mphDiv.querySelector("span").classList.remove("transparent");
-  meterphDiv.querySelector("span").classList.add("transparent");
-  mps.querySelector("span").classList.add("transparent");
-  localStorage.setItem("speedUnit", "mph");
-});
-
-meterphDiv.addEventListener("click", (event) => {
-  meterphDiv.querySelector("span").classList.remove("transparent");
-  mphDiv.querySelector("span").classList.add("transparent");
-  mps.querySelector("span").classList.add("transparent");
-  localStorage.setItem("speedUnit", "meterph");
-});
-
-mps.addEventListener("click", (event) => {
-  mps.querySelector("span").classList.remove("transparent");
-  meterphDiv.querySelector("span").classList.add("transparent");
-  mphDiv.querySelector("span").classList.add("transparent");
-  localStorage.setItem("speedUnit", "mps");
-});
-
 let unit = "us";
+let tempUnit = initOptions();
+console.log(tempUnit);
 if (userLocationLatLon) {
-  startWeatherUpdates(userLocationLatLon, unit, true, true);
+  await startWeatherUpdates(userLocationLatLon, unit, true, true, tempUnit);
   hideMessage("no-content-msg");
 } else if (!userLocationLatLon && !document.querySelectorAll(".summary-card")) {
   showMessage("no-content-msg");
 }
 
 const localWeatherData = JSON.parse(localStorage.getItem("weatherData"));
-const regex = /-[0-9]*\.[0-9]+,[0-9]*\.[0-9]+/;
+const regex =
+  /([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[Ee]([+-]?\d+))?,([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[Ee]([+-]?\d+))?/;
 if (localWeatherData) {
   for (const [key, value] of Object.entries(localWeatherData)) {
     console.log(key);
+    console.log(regex.test(key));
     if (regex.test(key)) {
       const [lat, lon] = key.split(",");
       console.log("is lat lon");
-      startWeatherUpdates({ lat, lon }, unit, true, false);
+      await startWeatherUpdates({ lat, lon }, unit, true, false, tempUnit);
     } else {
-      startWeatherUpdates(key, unit, false, false);
+      await startWeatherUpdates(key, unit, false, false, tempUnit);
     }
   }
 }
 
-initSearch(userLocationLatLon, unit);
+convertTemp(tempUnit);
+
+initSearch(userLocationLatLon, unit, tempUnit);

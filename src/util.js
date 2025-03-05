@@ -8,6 +8,81 @@ export const getDivPos = function (div) {
   return { x: centerX, y: centerY };
 };
 
+export const initOptions = function () {
+  const optionBtn = document.querySelector(".pending-icon");
+  const optionDiv = document.querySelector(".options");
+  const celsiusDiv = document.querySelector(".celsius");
+  const fDiv = document.querySelector(".fahrenheit");
+  const mphDiv = document.querySelector(".mph");
+  const meterphDiv = document.querySelector(".meter-per-h");
+  const mps = document.querySelector(".meter-per-sec");
+  const editBtn = document.querySelector(".edit-list");
+  let tempUnit = localStorage.getItem("tempUnit") || "f";
+  let prevTempUnit = "f";
+  // localStorage.setItem("tempUnit", "f");
+  // localStorage.setItem("weatherDetailTempUnit", "f");
+
+  let isOptionOpen = false;
+
+  editBtn.addEventListener("click", () => {
+    optionDiv.close();
+  });
+  optionBtn.addEventListener("click", () => {
+    optionDiv.showModal();
+  });
+
+  optionDiv.addEventListener("click", (event) => {
+    if (event.target === optionDiv) {
+      optionDiv.close();
+    }
+  });
+
+  celsiusDiv.addEventListener("click", (event) => {
+    celsiusDiv.querySelector("span").classList.remove("transparent");
+    fDiv.querySelector("span").classList.add("transparent");
+    localStorage.setItem("tempUnit", "c");
+    if (tempUnit === "f" || tempUnit === undefined) {
+      convertTemp("c");
+    }
+    tempUnit = "c";
+    optionDiv.close();
+  });
+
+  fDiv.addEventListener("click", (event) => {
+    fDiv.querySelector("span").classList.remove("transparent");
+    celsiusDiv.querySelector("span").classList.add("transparent");
+    localStorage.setItem("tempUnit", "f");
+    if (tempUnit === "c") {
+      convertTemp("f");
+    }
+    tempUnit = "f";
+    optionDiv.close();
+  });
+
+  mphDiv.addEventListener("click", (event) => {
+    mphDiv.querySelector("span").classList.remove("transparent");
+    meterphDiv.querySelector("span").classList.add("transparent");
+    mps.querySelector("span").classList.add("transparent");
+    localStorage.setItem("speedUnit", "mph");
+  });
+
+  meterphDiv.addEventListener("click", (event) => {
+    meterphDiv.querySelector("span").classList.remove("transparent");
+    mphDiv.querySelector("span").classList.add("transparent");
+    mps.querySelector("span").classList.add("transparent");
+    localStorage.setItem("speedUnit", "meterph");
+  });
+
+  mps.addEventListener("click", (event) => {
+    mps.querySelector("span").classList.remove("transparent");
+    meterphDiv.querySelector("span").classList.add("transparent");
+    mphDiv.querySelector("span").classList.add("transparent");
+    localStorage.setItem("speedUnit", "mps");
+  });
+
+  return tempUnit;
+};
+
 export const converDetailWeatherTemp = function (component, unit) {
   const currentTemp = component.querySelector(".current-temp");
   const highTemp = component.querySelector("p.high");
@@ -52,6 +127,7 @@ export const converDetailWeatherTemp = function (component, unit) {
 export const convertTemp = function (unit) {
   const allTemps = document.querySelectorAll(".summary-card div[class*=temp]");
   if (unit === "c") {
+    console.log("convert to c");
     allTemps.forEach((temp) => {
       if (temp.classList.contains("temp-wrap")) {
         return;
@@ -70,6 +146,8 @@ export const convertTemp = function (unit) {
       }
     });
   } else {
+    console.log("convert to f");
+
     allTemps.forEach((temp) => {
       if (temp.classList.contains("temp-wrap")) {
         return;

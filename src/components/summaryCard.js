@@ -3,11 +3,15 @@ import {
   setAnimation,
   playExpandAnimation,
 } from "../canvasAnimation/animationHandler";
-import { converDetailWeatherTemp, getDivPos, updateTime } from "../util";
+import { getDivPos, updateTime } from "../util";
 import { filterDataForSummaryCards } from "../data/dataHandler";
 import { createWeatherCard } from "../uiHandler";
 
-export const newSummaryCardComponent = async function (weatherData, query) {
+export const newSummaryCardComponent = async function (
+  weatherData,
+  query,
+  tempUnit,
+) {
   const summaryData = await filterDataForSummaryCards(weatherData, query); // no issue
   const struct = `
 
@@ -50,6 +54,7 @@ export const newSummaryCardComponent = async function (weatherData, query) {
       weatherData,
       summaryData,
       summaryCardPos,
+      tempUnit,
     );
     // converDetailWeatherTemp(detailCard, localStorage.getItem("tempUnit"));
   });

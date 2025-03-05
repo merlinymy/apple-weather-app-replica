@@ -14,6 +14,7 @@ export const startWeatherUpdates = async function (
   unit,
   isLatLon,
   isTracked,
+  tempUnit,
 ) {
   try {
     let weatherResponse, weatherData;
@@ -25,8 +26,10 @@ export const startWeatherUpdates = async function (
       if (localData) {
         let localWeatherData;
         if (query.lat) {
+          console.log(query.lat);
           localWeatherData = localData[`${query.lat},${query.lon}`];
         } else {
+          console.log(query);
           localWeatherData = localData[`${query}`];
         }
         if (localWeatherData) {
@@ -62,7 +65,7 @@ export const startWeatherUpdates = async function (
         localStorage.setItem("weatherData", JSON.stringify({}));
       }
     }
-    await updateSummaryCard(weatherData, query, true);
+    await updateSummaryCard(weatherData, query, true, tempUnit);
   } catch (error) {
     throw error;
   }
