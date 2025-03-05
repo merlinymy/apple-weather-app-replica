@@ -118,7 +118,8 @@ export const createWeatherCard = function (
   const mainContent = document.querySelector(".main-content");
   const component = weatherDetailCard(weatherData, summaryData);
   mainContent.append(component);
-  return mainContent;
+  const sideBar = document.querySelector(".side-bar");
+  mainContent.style.zIndex = "10";
 };
 
 export const updateSummaryCard = async function (
@@ -127,7 +128,6 @@ export const updateSummaryCard = async function (
   isTracked,
 ) {
   const contentDiv = document.querySelector(".side-bar > .content");
-  console.log(weatherData);
   const summaryCard = await newSummaryCardComponent(weatherData, query);
   if (isTracked) {
     contentDiv.prepend(summaryCard);

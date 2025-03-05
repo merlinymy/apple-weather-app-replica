@@ -32,12 +32,18 @@ export const startWeatherUpdates = async function (
         if (localWeatherData) {
           // see if need to be updated (every 30 mins)
           if (
-            differenceInMinutes(new Date().getTime(), localData.lastUpdate) > 30
+            differenceInMinutes(
+              new Date().getTime(),
+              localWeatherData.lastUpdate,
+            ) > 30
           ) {
             console.log("get new data");
-            weatherResponse = await getResponseFromName(query, unit);
+            if (query.lat) {
+              weatherResponse = await getResponseFromLatLon(query, unit);
+            } else {
+              weatherResponse = await getResponseFromName(query, unit);
+            }
             weatherData = await weatherResponse.json();
-            updateWeatherData(query, weatherData);
           } else {
             console.log("use local data");
             weatherData = JSON.parse(localWeatherData.data);

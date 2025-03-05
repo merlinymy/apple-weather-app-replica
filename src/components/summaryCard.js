@@ -42,28 +42,11 @@ export const newSummaryCardComponent = async function (weatherData, query) {
   setTimeout(() => {
     setAnimation(animationCanvas, summaryData);
   }, 0);
-  console.log(weatherData);
   component.addEventListener("click", () => {
     const sideBar = document.querySelector(".side-bar");
     const cardContent = document.querySelector(".card-content");
     const summaryCardPos = getDivPos(cardContent);
-    console.log("in summary card");
-    const mainContent = createWeatherCard(
-      weatherData,
-      summaryData,
-      summaryCardPos,
-    );
-
-    mainContent.style.height = `100dvh`;
-    mainContent.style.zIndex = "10";
-    // mainContent.style.overflow = "auto";
-    // mainContent.style.transform = "translateX(-100%)";
-
-    // console.log(summaryCardPos.x, summaryCardPos.y);
-    // mainContent.style.top = `${summaryCardPos.x}px`;
-    // mainContent.style.left = `${summaryCardPos.y}px`;
-    // mainContent.style.transform = "scaleY(1)";
-    // sideBar.style.opacity = 0;
+    createWeatherCard(weatherData, summaryData, summaryCardPos);
   });
   return component;
 };

@@ -29,12 +29,7 @@ export const weatherDetailCard = function (
   summaryData,
   divCenter,
 ) {
-  console.log("before aggregation");
-  console.log(weatherData);
   const data = aggregateData(weatherData, summaryData);
-  console.log("after");
-  console.log(weatherData);
-
   const timezone = weatherData.timezone;
   const time = getTimeFromTimezone(timezone);
   const currentConditions = weatherData.currentConditions.conditions;
@@ -129,13 +124,10 @@ export const weatherDetailCard = function (
 
   const listIcon = component.querySelector(".list-icon");
   listIcon.addEventListener("click", () => {
-    mainContent.style.height = `0px`;
-    mainContent.style.overflow = "hidden";
-    const wrap = document.querySelector(".wrap");
+    mainContent.style.zIndex = `-10`;
     setTimeout(() => {
       mainContent.innerHTML = "";
     }, 100);
-    console.log("clicked");
   });
 
   return component;
@@ -403,7 +395,6 @@ function populateUvDiv(data, component) {
 }
 
 function populateFeelsLike(data, component) {
-  console.log(data);
   const feelsLike = data.feelsLike;
   const curTemp = data.currentTemp;
   const cardTitle = createCardTitle("FEELS LIKE", "thermostat");
@@ -717,13 +708,11 @@ function aggregateData(weatherData, summaryData) {
   const uvindex = weatherData.currentConditions.uvindex;
   const currentCond = weatherData.currentConditions;
   // const timezone = "America/Los_Angeles";
-  console.log(JSON.parse(localStorage.getItem("weatherData")));
 
   const days = structuredClone(weatherData.days);
 
   const today = format(TZDate.tz(timezone), "yyyy-MM-dd");
   const tenDaysFromToday = format(addDays(today, 10), "yyyy-MM-dd");
-  console.dir(`before operation ${weatherData}`);
   const next10days = days
     .filter((day) => {
       return isIn10Days(today, tenDaysFromToday, day.datetime);
@@ -816,8 +805,6 @@ function aggregateData(weatherData, summaryData) {
       const isSunRaise = data.isSunRaise;
       return { time, condition, temp, precipprob, isSunRaise };
     });
-  console.dir(`after operation ${weatherData}`);
-
   return {
     location,
     currentTemp,
