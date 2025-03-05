@@ -28,20 +28,28 @@ const userLocationLatLon = await askForGeolocation();
 //   weatherData,
 //   userLocationLatLon,
 // );
-
+let unit = "us";
 if (userLocationLatLon) {
   // createWeatherCard(weatherData, summaryData);
-  startWeatherUpdates(userLocationLatLon, "us", true, true);
+  startWeatherUpdates(userLocationLatLon, unit, true, true);
   hideMessage("no-content-msg");
 } else if (!userLocationLatLon && !document.querySelectorAll(".summary-card")) {
   showMessage("no-content-msg");
 }
 
 const localWeatherData = JSON.parse(localStorage.getItem("weatherData"));
+const regex = /-[0-9]*\.[0-9]+,[0-9]*\.[0-9]+/;
 if (localWeatherData) {
   for (const [key, value] of Object.entries(localWeatherData)) {
-    updateSummaryCard(value, key);
+    console.log(key);
+    if (regex.test(key)) {
+      const [lat, lon] = key.split(",");
+      console.log("is lat lon");
+      startWeatherUpdates({ lat, lon }, unit, true, false);
+    } else {
+      startWeatherUpdates(key, unit, false, false);
+    }
   }
 }
 
-initSearch(userLocationLatLon);
+initSearch(userLocationLatLon, unit);

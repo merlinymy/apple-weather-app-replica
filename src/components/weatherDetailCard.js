@@ -124,13 +124,10 @@ export const weatherDetailCard = function (
 
   const listIcon = component.querySelector(".list-icon");
   listIcon.addEventListener("click", () => {
-    mainContent.style.height = `0px`;
-    mainContent.style.overflow = "hidden";
-    const wrap = document.querySelector(".wrap");
+    mainContent.style.zIndex = `-10`;
     setTimeout(() => {
       mainContent.innerHTML = "";
     }, 100);
-    console.log("clicked");
   });
 
   return component;
@@ -398,7 +395,6 @@ function populateUvDiv(data, component) {
 }
 
 function populateFeelsLike(data, component) {
-  console.log(data);
   const feelsLike = data.feelsLike;
   const curTemp = data.currentTemp;
   const cardTitle = createCardTitle("FEELS LIKE", "thermostat");
@@ -702,7 +698,6 @@ function isIn10Days(today, in10Days, dateTocheck) {
 function aggregateData(weatherData, summaryData) {
   const location = summaryData.location;
   const currentTemp = summaryData.currentTemp;
-  console.log(weatherData);
   const feelsLike = Math.round(weatherData.currentConditions.feelslike);
   const high = summaryData.maxTemp;
   const low = summaryData.minTemp;
@@ -714,7 +709,7 @@ function aggregateData(weatherData, summaryData) {
   const currentCond = weatherData.currentConditions;
   // const timezone = "America/Los_Angeles";
 
-  const days = weatherData.days;
+  const days = structuredClone(weatherData.days);
 
   const today = format(TZDate.tz(timezone), "yyyy-MM-dd");
   const tenDaysFromToday = format(addDays(today, 10), "yyyy-MM-dd");
@@ -810,7 +805,6 @@ function aggregateData(weatherData, summaryData) {
       const isSunRaise = data.isSunRaise;
       return { time, condition, temp, precipprob, isSunRaise };
     });
-
   return {
     location,
     currentTemp,
