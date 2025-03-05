@@ -23,12 +23,34 @@ export const initOptions = function () {
   // localStorage.setItem("weatherDetailTempUnit", "f");
 
   let isOptionOpen = false;
+  let isEditing = false;
+  // update checkmark
+  if (tempUnit === "c") {
+    celsiusDiv.querySelector("span").classList.remove("transparent");
+    fDiv.querySelector("span").classList.add("transparent");
+  } else {
+    celsiusDiv.querySelector("span").classList.add("transparent");
+    fDiv.querySelector("span").classList.remove("transparent");
+  }
 
   editBtn.addEventListener("click", () => {
     optionDiv.close();
+    isEditing = true;
+    document.querySelectorAll(".remove-icon-wrap").forEach((div) => {
+      div.classList.remove("hidden");
+    });
+    optionBtn.innerHTML = "done_all";
   });
   optionBtn.addEventListener("click", () => {
-    optionDiv.showModal();
+    if (!isEditing) {
+      optionDiv.showModal();
+    } else {
+      document.querySelectorAll(".remove-icon-wrap").forEach((div) => {
+        div.classList.add("hidden");
+      });
+      optionBtn.innerHTML = "pending";
+      isEditing = false;
+    }
   });
 
   optionDiv.addEventListener("click", (event) => {
@@ -42,7 +64,7 @@ export const initOptions = function () {
     fDiv.querySelector("span").classList.add("transparent");
     localStorage.setItem("tempUnit", "c");
     if (tempUnit === "f" || tempUnit === undefined) {
-      convertTemp("c");
+      convertTemp(null, "c");
     }
     tempUnit = "c";
     optionDiv.close();
@@ -53,7 +75,7 @@ export const initOptions = function () {
     celsiusDiv.querySelector("span").classList.add("transparent");
     localStorage.setItem("tempUnit", "f");
     if (tempUnit === "c") {
-      convertTemp("f");
+      convertTemp(null, "f");
     }
     tempUnit = "f";
     optionDiv.close();
@@ -98,13 +120,13 @@ export const converDetailWeatherTemp = function (component, unit) {
     highTemp.textContent = `H:${Math.round(fahrenheitToCelsius(parseFloat(highTemp.textContent.split(":")[1])))}\u00B0`;
     lowTemp.textContent = `L:${Math.round(fahrenheitToCelsius(parseFloat(lowTemp.textContent.split(":")[1])))}\u00B0`;
     hourlyTemps.forEach((temp) => {
-      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(hourlyTemps.textContent)))}\u00B0`;
+      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(temp.textContent)))}\u00B0`;
     });
     tempRangeLows.forEach((temp) => {
-      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(tempRangeLows.textContent)))}\u00B0`;
+      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(temp.textContent)))}\u00B0`;
     });
     tempRangeHighs.forEach((temp) => {
-      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(tempRangeHighs.textContent)))}\u00B0`;
+      temp.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(temp.textContent)))}\u00B0`;
     });
     feelsLike.textContent = `${Math.round(fahrenheitToCelsius(parseFloat(feelsLike.textContent)))}\u00B0`;
   } else {
@@ -112,22 +134,26 @@ export const converDetailWeatherTemp = function (component, unit) {
     highTemp.textContent = `H:${Math.round(celsiusToFahrenheit(parseFloat(highTemp.textContent.split(":")[1])))}\u00B0`;
     lowTemp.textContent = `L:${Math.round(celsiusToFahrenheit(parseFloat(lowTemp.textContent.split(":")[1])))}\u00B0`;
     hourlyTemps.forEach((temp) => {
-      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(hourlyTemps.textContent)))}\u00B0`;
+      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(temp.textContent)))}\u00B0`;
     });
     tempRangeLows.forEach((temp) => {
-      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(tempRangeLows.textContent)))}\u00B0`;
+      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(temp.textContent)))}\u00B0`;
     });
     tempRangeHighs.forEach((temp) => {
-      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(tempRangeHighs.textContent)))}\u00B0`;
+      temp.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(temp.textContent)))}\u00B0`;
     });
     feelsLike.textContent = `${Math.round(celsiusToFahrenheit(parseFloat(feelsLike.textContent)))}\u00B0`;
   }
 };
 
-export const convertTemp = function (unit) {
-  const allTemps = document.querySelectorAll(".summary-card div[class*=temp]");
+export const convertTemp = function (div, unit) {
+  let allTemps;
+  if (div) {
+    allTemps = div.querySelectorAll("div[class*=temp]");
+  } else {
+    allTemps = document.querySelectorAll(".summary-card div[class*=temp]");
+  }
   if (unit === "c") {
-    console.log("convert to c");
     allTemps.forEach((temp) => {
       if (temp.classList.contains("temp-wrap")) {
         return;

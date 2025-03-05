@@ -15,12 +15,14 @@ export const startWeatherUpdates = async function (
   isLatLon,
   isTracked,
   tempUnit,
+  onLoad,
 ) {
   try {
-    let weatherResponse, weatherData;
+    let weatherResponse, weatherData, dataId;
     if (isTracked) {
       weatherResponse = await getResponseFromLatLon(query, unit);
       weatherData = await weatherResponse.json();
+      await updateSummaryCard(weatherData, query, true, tempUnit, onLoad);
     } else {
       const localData = JSON.parse(localStorage.getItem("weatherData"));
       if (localData) {
@@ -34,6 +36,7 @@ export const startWeatherUpdates = async function (
         }
         if (localWeatherData) {
           // see if need to be updated (every 30 mins)
+          dataId = localWeatherData.id;
           if (
             differenceInMinutes(
               new Date().getTime(),
@@ -59,13 +62,29 @@ export const startWeatherUpdates = async function (
           }
           weatherData = await weatherResponse.json();
 
-          storeWeatherData(query, weatherData);
+          dataId = storeWeatherData(query, weatherData);
+          console.log(dataId);
         }
       } else {
         localStorage.setItem("weatherData", JSON.stringify({}));
+        if (query.lat) {
+          weatherResponse = await getResponseFromLatLon(query, unit);
+        } else {
+          weatherResponse = await getResponseFromName(query, unit);
+        }
+        weatherData = await weatherResponse.json();
+
+        dataId = storeWeatherData(query, weatherData);
       }
+      await updateSummaryCard(
+        weatherData,
+        query,
+        false,
+        tempUnit,
+        onLoad,
+        dataId,
+      );
     }
-    await updateSummaryCard(weatherData, query, true, tempUnit);
   } catch (error) {
     throw error;
   }
@@ -129,6 +148,7 @@ export const getResponseFromName = async function (location, unit) {
 export const filterDataForSummaryCards = async function (response, query) {
   `query can by a latlon object or a location string`;
   let location;
+  console.log(response);
   if (query.lat) {
     location = await getLocationName(query.lat, query.lon);
   } else {

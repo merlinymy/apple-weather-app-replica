@@ -3,14 +3,17 @@ import {
   setAnimation,
   playExpandAnimation,
 } from "../canvasAnimation/animationHandler";
-import { getDivPos, updateTime } from "../util";
+import { converDetailWeatherTemp, getDivPos, updateTime } from "../util";
 import { filterDataForSummaryCards } from "../data/dataHandler";
 import { createWeatherCard } from "../uiHandler";
+import { deleteByDataId } from "../data/localStorageHandler";
 
 export const newSummaryCardComponent = async function (
   weatherData,
   query,
   tempUnit,
+  dataId,
+  isTracked,
 ) {
   const summaryData = await filterDataForSummaryCards(weatherData, query); // no issue
   const struct = `
@@ -33,30 +36,50 @@ export const newSummaryCardComponent = async function (
             </div>
         </div>
     </div>
+    <div class="remove-icon-wrap hidden"><span class="material-symbols-outlined remove-icon">
+remove
+</span></div>
   
   `;
 
   const component = document.createElement("div");
-  component.classList.add("summary-card");
-
+  component.classList.add("summary-card", `id-${dataId}`);
   component.innerHTML = struct;
+  const deleteBtn = component.querySelector(".remove-icon-wrap");
+  if (isTracked) {
+    deleteBtn.remove();
+    const locationName = component.querySelector(".location-name");
+    locationName.innerHTML = `${summaryData.location}<span class="material-symbols-outlined">
+location_on
+</span>`;
+  }
+  deleteBtn.addEventListener("click", (event) => {
+    component.remove();
+    deleteByDataId(dataId);
+  });
+
   const timeDiv = component.querySelector(".time");
   updateTime(timeDiv, summaryData.timezone);
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
     setAnimation(animationCanvas, summaryData);
   }, 0);
-  component.addEventListener("click", () => {
-    const sideBar = document.querySelector(".side-bar");
-    const cardContent = document.querySelector(".card-content");
-    const summaryCardPos = getDivPos(cardContent);
-    const detailCard = createWeatherCard(
-      weatherData,
-      summaryData,
-      summaryCardPos,
-      tempUnit,
-    );
-    // converDetailWeatherTemp(detailCard, localStorage.getItem("tempUnit"));
+  component.addEventListener("click", (event) => {
+    if (event.target !== deleteBtn && !deleteBtn.contains(event.target)) {
+      console.log(event.target);
+      const sideBar = document.querySelector(".side-bar");
+      const cardContent = document.querySelector(".card-content");
+      const summaryCardPos = getDivPos(cardContent);
+      const detailCard = createWeatherCard(
+        weatherData,
+        summaryData,
+        summaryCardPos,
+        tempUnit,
+      );
+      if (localStorage.getItem("tempUnit") === "c") {
+        converDetailWeatherTemp(detailCard, localStorage.getItem("tempUnit"));
+      }
+    }
   });
   return component;
 };

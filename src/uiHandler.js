@@ -28,9 +28,11 @@ export const appendSearchResults = function (results, unit, tempUnit) {
           unit,
           false,
           false,
-          tempUnit,
+          localStorage.getItem("tempUnit"),
+          true,
         );
       } catch (error) {
+        console.log(error);
         try {
           console.log("lat lon form");
 
@@ -39,13 +41,13 @@ export const appendSearchResults = function (results, unit, tempUnit) {
             unit,
             true,
             false,
-            tempUnit,
+            localStorage.getItem("tempUnit"),
+            true,
           );
         } catch (error) {
           alert("Area currently has no weather data");
         }
       }
-      convertTemp(tempUnit);
       resultsDiv.innerHTML = "";
       searchBarWrap.style.display = "block";
       searchPage.style.height = "100%";
@@ -141,17 +143,26 @@ export const updateSummaryCard = async function (
   query,
   isTracked,
   tempUnit,
+  onLoad,
+  dataId,
 ) {
   const contentDiv = document.querySelector(".side-bar > .content");
   const summaryCard = await newSummaryCardComponent(
     weatherData,
     query,
     tempUnit,
+    dataId,
+    isTracked,
   );
   if (isTracked) {
+    console.log("prepend");
     contentDiv.prepend(summaryCard);
   } else {
+    console.log("append");
     contentDiv.append(summaryCard);
+  }
+  if (!(onLoad && tempUnit === "f")) {
+    convertTemp(summaryCard, tempUnit);
   }
 };
 

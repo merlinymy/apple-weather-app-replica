@@ -9,9 +9,16 @@ const userLocationLatLon = await askForGeolocation();
 
 let unit = "us";
 let tempUnit = initOptions();
-console.log(tempUnit);
+const onLoad = true;
 if (userLocationLatLon) {
-  await startWeatherUpdates(userLocationLatLon, unit, true, true, tempUnit);
+  await startWeatherUpdates(
+    userLocationLatLon,
+    unit,
+    true,
+    true,
+    tempUnit,
+    onLoad,
+  );
   hideMessage("no-content-msg");
 } else if (!userLocationLatLon && !document.querySelectorAll(".summary-card")) {
   showMessage("no-content-msg");
@@ -22,18 +29,22 @@ const regex =
   /([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[Ee]([+-]?\d+))?,([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[Ee]([+-]?\d+))?/;
 if (localWeatherData) {
   for (const [key, value] of Object.entries(localWeatherData)) {
-    console.log(key);
-    console.log(regex.test(key));
     if (regex.test(key)) {
       const [lat, lon] = key.split(",");
-      console.log("is lat lon");
-      await startWeatherUpdates({ lat, lon }, unit, true, false, tempUnit);
+      await startWeatherUpdates(
+        { lat, lon },
+        unit,
+        true,
+        false,
+        tempUnit,
+        onLoad,
+      );
     } else {
-      await startWeatherUpdates(key, unit, false, false, tempUnit);
+      await startWeatherUpdates(key, unit, false, false, tempUnit, onLoad);
     }
   }
 }
 
-convertTemp(tempUnit);
+// convertTemp(null, tempUnit);
 
 initSearch(userLocationLatLon, unit, tempUnit);
