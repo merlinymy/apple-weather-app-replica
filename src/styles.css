@@ -163,6 +163,7 @@ dialog:open{
 
 .remove-icon-wrap {
     position: absolute;
+    z-index: 10000;
  top: -10%;
  right: 0%;
  width: 25px;
