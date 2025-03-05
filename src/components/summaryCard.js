@@ -9,6 +9,7 @@ import { createWeatherCard } from "../uiHandler";
 
 export const newSummaryCardComponent = async function (weatherData, query) {
   const summaryData = await filterDataForSummaryCards(weatherData, query);
+  console.log(summaryData);
   const struct = `
 
     <div class="card-animation">
@@ -46,13 +47,13 @@ export const newSummaryCardComponent = async function (weatherData, query) {
   component.addEventListener("click", () => {
     const weatherDataFromStorage = JSON.parse(
       localStorage.getItem("weatherData"),
-    )[`${weatherData.address}`];
+    );
     const sideBar = document.querySelector(".side-bar");
     const cardContent = document.querySelector(".card-content");
     const summaryCardPos = getDivPos(cardContent);
 
     const mainContent = createWeatherCard(
-      weatherDataFromStorage || weatherData,
+      weatherData,
       summaryData,
       summaryCardPos,
     );

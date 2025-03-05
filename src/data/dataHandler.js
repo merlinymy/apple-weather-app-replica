@@ -1,6 +1,13 @@
 import { getTimeFromTimezone, getCurrentDate, getLocationName } from "../util";
 import { updateSummaryCard } from "../uiHandler";
 import { hideMessage } from "../uiHandler";
+import {
+  createWeatherData,
+  getLocalData,
+  storeWeatherData,
+  updateWeatherData,
+} from "./localStorageHandler";
+import { differenceInMinutes, sub } from "date-fns";
 
 export const startWeatherUpdates = async function (
   query,
@@ -8,41 +15,59 @@ export const startWeatherUpdates = async function (
   isLatLon,
   isTracked,
 ) {
-  async function fetchAndUpdate() {
-    let weatherData;
-    try {
-      const weatherResponse = isLatLon
-        ? await getResponseFromLatLon(query, unit)
-        : await getResponseFromName(query, unit);
-
+  try {
+    let weatherResponse, weatherData;
+    if (isTracked) {
+      console.log(query);
+      weatherResponse = await getResponseFromLatLon(query, unit);
       weatherData = await weatherResponse.json();
-      const localWeatherData = JSON.parse(localStorage.getItem("weatherData"));
-      if (!isTracked) {
-        if (localWeatherData) {
-          localWeatherData[`${weatherData.address}`] = weatherData;
-          localStorage.setItem("weatherData", JSON.stringify(localWeatherData));
+    } else {
+      const localData = JSON.parse(localStorage.getItem("weatherData"));
+      if (localData) {
+        let localWeatherData;
+        if (query.lat) {
+          localWeatherData = localData[`${query.lat},${query.lon}`];
+          console.log(localWeatherData);
         } else {
-          localStorage.setItem(
-            "weatherData",
-            JSON.stringify({ [`${weatherData.address}`]: weatherData }),
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching weather:", error);
+          console.log(localData[`${query}`]);
 
-      weatherData = JSON.parse(localStorage.getItem("weatherData"));
-    } finally {
-      if (weatherData) {
-        console.log(query);
-        await updateSummaryCard(weatherData, query, isTracked);
-        hideMessage("no-content-msg");
+          localWeatherData = localData[`${query}`];
+        }
+        if (localWeatherData) {
+          // see if need to be updated (every 30 mins)
+          if (
+            differenceInMinutes(new Date().getTime(), localData.lastUpdate) > 30
+          ) {
+            console.log("get data from api");
+
+            weatherResponse = await getResponseFromName(query, unit);
+            weatherData = await weatherResponse.json();
+            updateWeatherData(query, weatherData);
+          } else {
+            console.log("get data from local");
+            weatherData = JSON.parse(localWeatherData.data);
+            console.log(weatherData);
+          }
+        } else {
+          console.log("get data from api");
+
+          if (query.lat) {
+            weatherResponse = await getResponseFromLatLon(query, unit);
+          } else {
+            weatherResponse = await getResponseFromName(query, unit);
+          }
+          weatherData = await weatherResponse.json();
+
+          storeWeatherData(query, weatherData);
+        }
+      } else {
+        localStorage.setItem("weatherData", JSON.stringify({}));
       }
     }
-    setTimeout(fetchAndUpdate, 30 * 60 * 1000);
+    await updateSummaryCard(weatherData, query, true);
+  } catch (error) {
+    throw error;
   }
-
-  fetchAndUpdate();
 };
 
 const getPlaceAutoComplete = async function (input, lat, lon) {
@@ -75,19 +100,31 @@ const debounce = function (func, delay) {
 export const debouncePlaceAutoComplete = debounce(getPlaceAutoComplete, 300);
 
 export const getResponseFromLatLon = async function (latlon, unit) {
-  const api_key = "UFGA2UZ292DF95ZP7TNJQEYGD";
-  const lat = latlon.lat;
-  const lon = latlon.lon;
-  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat}%2C${lon}?unitGroup=${unit}&key=${api_key}&contentType=json&elements=%2Baqius`;
-  return await fetch(url);
+  try {
+    const api_key = "UFGA2UZ292DF95ZP7TNJQEYGD";
+    const lat = latlon.lat;
+    const lon = latlon.lon;
+    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat}%2C${lon}?unitGroup=${unit}&key=${api_key}&contentType=json&elements=%2Baqius`;
+    return await fetch(url);
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getResponseFromName = async function (location, unit) {
-  const api_key = "UFGA2UZ292DF95ZP7TNJQEYGD";
-  const lat = location.lat;
-  const lon = location.lon;
-  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?unitGroup=${unit}&key=${api_key}&contentType=json&elements=%2Baqius`;
-  return await fetch(url);
+  try {
+    const api_key = "UFGA2UZ292DF95ZP7TNJQEYGD";
+    const lat = location.lat;
+    const lon = location.lon;
+    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?unitGroup=${unit}&key=${api_key}&contentType=json&elements=%2Baqius`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`In getResponseFromName ${await response.text()}`);
+    }
+    return response;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const filterDataForSummaryCards = async function (response, query) {
@@ -96,7 +133,7 @@ export const filterDataForSummaryCards = async function (response, query) {
   if (query.lat) {
     location = await getLocationName(query.lat, query.lon);
   } else {
-    location = response.resolvedAddress.split(",")[0];
+    location = response.address.split(",")[0];
   }
   const timezone = response.timezone;
   const currentTemp = Math.round(response.currentConditions.temp);

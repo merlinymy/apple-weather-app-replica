@@ -6,7 +6,7 @@ import {
 import { weatherDetailCard } from "./components/weatherDetailCard";
 import { div } from "./domStruct/newDomStructs";
 import { debouncePlaceAutoComplete } from "./data/dataHandler";
-export const appendSearchResults = function (results) {
+export const appendSearchResults = function (results, unit) {
   const searchInput = document.querySelector("#search");
   const searchBar = document.querySelector(".search-bar");
   const searchPage = document.querySelector(".search-page");
@@ -19,9 +19,23 @@ export const appendSearchResults = function (results) {
     const resDiv = div("res");
     resDiv.textContent = res.address_long;
     resultsDiv.append(resDiv);
-    console.log(res.address_long);
-    resDiv.addEventListener("click", () => {
-      startWeatherUpdates(res.address_long, "us", false, false);
+    resDiv.addEventListener("click", async () => {
+      console.log(res.address_long);
+      try {
+        await startWeatherUpdates(res.address_long, unit, false, false);
+      } catch (error) {
+        try {
+          await startWeatherUpdates(
+            { lat: res.lat, lon: res.lon },
+            unit,
+            true,
+            false,
+          );
+        } catch (error) {
+          console.log(error);
+          alert("Area currently has no weather data");
+        }
+      }
       resultsDiv.innerHTML = "";
       searchBarWrap.style.display = "block";
       searchPage.style.height = "100%";
@@ -34,7 +48,7 @@ export const appendSearchResults = function (results) {
     });
   });
 };
-export const initSearch = function (userLocationLatLon) {
+export const initSearch = function (userLocationLatLon, unit) {
   const searchInput = document.querySelector("#search");
   const searchBar = document.querySelector(".search-bar");
   const cancelIcon = document.querySelector(".cancel-icon");
@@ -86,7 +100,7 @@ export const initSearch = function (userLocationLatLon) {
         const lon = res.lon;
         return { address_long, lat, lon };
       });
-      appendSearchResults(results);
+      appendSearchResults(results, unit);
       console.log(results);
     }
 
@@ -119,31 +133,12 @@ export const updateSummaryCard = async function (
   console.log(`working on ${query}`);
   const summaryData = await filterDataForSummaryCards(weatherData, query);
   const contentDiv = document.querySelector(".side-bar > .content");
-  const existingCard = contentDiv.querySelector(
-    `.${summaryData.location.replace(/[^a-zA-Z0-9]/g, "")}`,
-  ); // Find existing card
 
-  if (existingCard) {
-    console.log("Updating existing summary card...");
-
-    // ✅ Update necessary elements inside the existing summary card
-    existingCard.querySelector(".location-name").textContent =
-      summaryData.location;
-    existingCard.querySelector(".current-temp").textContent =
-      `${summaryData.currentTemp}°`;
-    existingCard.querySelector(".text-summary").textContent =
-      summaryData.currentConditions;
-    existingCard.querySelector(".temp-high").textContent =
-      `H: ${summaryData.maxTemp}°`;
-    existingCard.querySelector(".temp-low").textContent =
-      `L: ${summaryData.minTemp}°`;
+  const summaryCard = await newSummaryCardComponent(weatherData, query);
+  if (isTracked) {
+    contentDiv.prepend(summaryCard);
   } else {
-    const summaryCard = await newSummaryCardComponent(weatherData, query);
-    if (isTracked) {
-      contentDiv.prepend(summaryCard);
-    } else {
-      contentDiv.append(summaryCard);
-    }
+    contentDiv.append(summaryCard);
   }
 };
 
