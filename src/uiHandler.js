@@ -90,7 +90,7 @@ export const initSearch = function (userLocationLatLon, unit, tempUnit) {
     sideContent.classList.add("hidden");
     searchBarWrap.style.display = "flex";
     searchPage.style.height = "100dvh";
-    searchPage.style.zIndex = "10000";
+    searchPage.style.zIndex = "10";
     searchBar.style.width = "80%";
     cancelBtn.classList.remove("hidden");
     optionBtn.classList.add("hidden");

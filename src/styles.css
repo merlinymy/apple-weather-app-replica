@@ -52,7 +52,9 @@ body {
     position: relative;
     flex-direction: column;
     gap: 1rem;
+    max-height: 100dvh;
     height: 100dvh;
+    overflow: hidden;
     padding: 0.55rem;
     flex: 4 0 auto;
     /* max-width: 300px; */
@@ -163,7 +165,7 @@ dialog:open{
 
 .remove-icon-wrap {
     position: absolute;
-    z-index: 10000;
+    z-index: 1000;
  top: -10%;
  right: 0%;
  width: 25px;
@@ -740,6 +742,8 @@ p.current-temp {
 .side-bar > .content {
     display: flex;
     flex-direction: column;
+    overflow: scroll;
+    height: 100dvh;
     gap: 1rem;
 }
 

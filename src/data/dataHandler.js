@@ -20,8 +20,12 @@ export const startWeatherUpdates = async function (
   try {
     let weatherResponse, weatherData, dataId;
     if (isTracked) {
-      weatherResponse = await getResponseFromLatLon(query, unit);
-      weatherData = await weatherResponse.json();
+      try {
+        weatherResponse = await getResponseFromLatLon(query, unit);
+        weatherData = await weatherResponse.json();
+      } catch (error) {
+        console.log(error);
+      }
       await updateSummaryCard(weatherData, query, true, tempUnit, onLoad);
     } else {
       const localData = JSON.parse(localStorage.getItem("weatherData"));
@@ -123,9 +127,14 @@ export const getResponseFromLatLon = async function (latlon, unit) {
     const lat = latlon.lat;
     const lon = latlon.lon;
     const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${lat}%2C${lon}?unitGroup=${unit}&key=${api_key}&contentType=json&elements=%2Baqius`;
-    return await fetch(url);
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`In getResponseFromName ${await response.text()}`);
+    }
+    return response;
   } catch (error) {
-    throw error;
+    alert(error);
+    console.log(error);
   }
 };
 
