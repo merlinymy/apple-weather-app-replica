@@ -35,6 +35,7 @@ export const initOptions = function () {
 
   editBtn.addEventListener("click", () => {
     optionDiv.close();
+    document.body.setAttribute("is-editing", "true");
     isEditing = true;
     document.querySelectorAll(".remove-icon-wrap").forEach((div) => {
       div.classList.remove("hidden");
@@ -42,7 +43,7 @@ export const initOptions = function () {
     optionBtn.innerHTML = "done_all";
   });
   optionBtn.addEventListener("click", () => {
-    if (!isEditing) {
+    if (document.body.getAttribute("is-editing") !== "true") {
       optionDiv.showModal();
     } else {
       document.querySelectorAll(".remove-icon-wrap").forEach((div) => {
@@ -50,6 +51,7 @@ export const initOptions = function () {
       });
       optionBtn.innerHTML = "pending";
       isEditing = false;
+      document.body.setAttribute("is-editing", "false");
     }
   });
 

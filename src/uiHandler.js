@@ -28,7 +28,7 @@ export const appendSearchResults = function (results, unit, tempUnit) {
           unit,
           false,
           false,
-          localStorage.getItem("tempUnit"),
+          localStorage.getItem("tempUnit") || "f",
           true,
         );
       } catch (error) {
@@ -41,7 +41,7 @@ export const appendSearchResults = function (results, unit, tempUnit) {
             unit,
             true,
             false,
-            localStorage.getItem("tempUnit"),
+            localStorage.getItem("tempUnit") || "f",
             true,
           );
         } catch (error) {

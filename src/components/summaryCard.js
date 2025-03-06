@@ -53,7 +53,7 @@ remove
 location_on
 </span>`;
   }
-  deleteBtn.addEventListener("click", (event) => {
+  deleteBtn.addEventListener("click", () => {
     component.remove();
     deleteByDataId(dataId);
   });
@@ -65,6 +65,9 @@ location_on
     setAnimation(animationCanvas, summaryData);
   }, 0);
   component.addEventListener("click", (event) => {
+    if (document.body.getAttribute("is-editing") === "true") {
+      return;
+    }
     if (event.target !== deleteBtn && !deleteBtn.contains(event.target)) {
       console.log(event.target);
       const sideBar = document.querySelector(".side-bar");

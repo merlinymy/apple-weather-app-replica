@@ -314,7 +314,7 @@ p.current-temp {
 
 .forcast-24-wrap {
     justify-content: center;
-    max-width: 900px; 
+    /* max-width: 900px;  */
     width: 90dvw;
     border-radius: 15px;
     background-color: var(--card-bg);
@@ -747,7 +747,7 @@ p.current-temp {
     gap: 1rem;
 }
 
-@media (max-width: 720px) {
+/* @media (max-width: 720px) { */
     /* .side-bar {
         display: none;
     } */
@@ -813,7 +813,7 @@ p.current-temp {
         max-width: none;
         max-height: none;
     }
-}
+/* } */
 
 .hidden {
     display: none;
