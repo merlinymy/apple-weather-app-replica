@@ -27,11 +27,13 @@ import {
   getTimeFromTimezone,
   converDetailWeatherTemp,
 } from "../util";
+import { createWeatherCard } from "../uiHandler";
 
 export const weatherDetailCard = function (weatherData, summaryData, tempUnit) {
   const data = aggregateData(weatherData, summaryData);
-  const timezone = weatherData.timezone;
-  const time = getTimeFromTimezone(timezone);
+  const sunrise = `2025-01-01 ${weatherData.currentConditions.sunrise}`;
+  const sunset = `2025-01-01 ${weatherData.currentConditions.sunset}`;
+  const curtime = `2025-01-01 ${weatherData.currentConditions.datetime}`;
   const currentConditions = weatherData.currentConditions.conditions;
   const struct = `
   <div class="card-animation">
@@ -76,7 +78,30 @@ export const weatherDetailCard = function (weatherData, summaryData, tempUnit) {
   const component = document.createElement("div");
   component.innerHTML = struct;
   component.classList.add("detailcard");
+  // TODO: Nav Bar
+  //   const navList = component.querySelector(".nav-sec");
+  //   const summaryCards = document.querySelectorAll(".summary-card");
+  //   summaryCards.forEach((card) => {
+  //     if (card.classList.contains("id-undefined")) {
+  //       const navIcon = div("nav-icon");
+  //       const navSvg = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  // <path d="M1 11.4211L23 1L12.5789 23L10.2632 13.7368L1 11.4211Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  // </svg>
+  // `;
+  //       navIcon.innerHTML = navSvg;
+  //       navIcon.classList.add(card.className.split(" ")[1]);
+  //       navIcon.addEventListener('click', ()=>{
+  //         mainContent.innerHTML = "";
 
+  //         createWeatherCard()
+  //       })
+  //       navList.append(navIcon);
+  //     } else {
+  //       const navIcon = div("nav-dot");
+  //       navIcon.classList.add(card.className.split(" ")[1]);
+  //       navList.append(navIcon);
+  //     }
+  //   });
   // 24 hour forcast
   const hour24Scroll = component.querySelector(".hour24");
   populateScroll(data, hour24Scroll);
@@ -108,17 +133,21 @@ export const weatherDetailCard = function (weatherData, summaryData, tempUnit) {
   // background animation
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
-    setAnimation(animationCanvas, summaryData);
+    setAnimation(animationCanvas, weatherData, summaryData);
   }, 0);
 
   const mainContent = document.querySelector(".main-content");
   mainContent.style.backgroundColor = setBackgroundColor(
-    time,
+    curtime,
+    sunrise,
+    sunset,
     currentConditions,
   );
   const btmToolBar = component.querySelector(".btm-tool-bar");
   btmToolBar.style.backgroundColor = setBackgroundColor(
-    time,
+    curtime,
+    sunrise,
+    sunset,
     currentConditions,
   );
 

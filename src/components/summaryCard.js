@@ -62,7 +62,7 @@ location_on
   updateTime(timeDiv, summaryData.timezone);
   const animationCanvas = component.querySelector(".card-animation");
   setTimeout(() => {
-    setAnimation(animationCanvas, summaryData);
+    setAnimation(animationCanvas, weatherData, summaryData);
   }, 0);
   component.addEventListener("click", (event) => {
     if (document.body.getAttribute("is-editing") === "true") {

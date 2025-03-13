@@ -1,3 +1,4 @@
+import { differenceInHours, differenceInMinutes } from "date-fns";
 import { onGeolocationRefuse } from "./uiHandler";
 
 export const getDivPos = function (div) {
@@ -204,15 +205,17 @@ function fahrenheitToCelsius(fahrenheit) {
   return ((fahrenheit - 32) * 5) / 9;
 }
 
-export const setBackgroundColor = function (time, currentConditions) {
-  const curTime = convertToDate(time);
-  const sunriseTime = convertToDate("7:00 AM");
-  const sunsetTime = convertToDate("7:00 PM");
+export const setBackgroundColor = function (
+  curtime,
+  sunrise,
+  sunset,
+  currentConditions,
+) {
   const condition = currentConditions.toLowerCase();
 
   let baseColor;
 
-  if (curTime >= sunriseTime && curTime <= sunsetTime) {
+  if (curtime >= sunrise && curtime <= sunset) {
     baseColor = "#87CEEB"; // Daytime sky (light blue)
     if (condition.includes("clear")) {
       baseColor = baseColor; // No change, sky remains as per time
@@ -228,8 +231,8 @@ export const setBackgroundColor = function (time, currentConditions) {
       baseColor = "#DDEEFF"; // Very light blue to reflect snowy brightness
     }
     if (
-      curTime < convertToDate("8:00 AM") ||
-      curTime > convertToDate("5:00 PM")
+      differenceInMinutes(curtime, sunrise) <= 60 ||
+      differenceInMinutes(curtime, sunset) <= 60
     ) {
       baseColor = "#c0b9ff"; // Soft peach near sunrise/sunset
     }

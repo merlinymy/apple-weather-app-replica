@@ -268,8 +268,26 @@ canvas {
     width: 80%;
     display: flex;
     justify-content: center;
+    gap: 0.5rem;
+    align-items: center;
 }
 
+.nav-icon {
+    height: 12px;
+    width: 12px;
+}
+
+svg {
+    display: grid;
+    margin: auto;
+}
+
+.nav-dot {
+    height: 8px;
+    width: 8px;
+    border-radius: 50px;
+    background-color: var(--white-transparent);
+}
 .overview-wrap {
     display: flex;
     justify-content: center;

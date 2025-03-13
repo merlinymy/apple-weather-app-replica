@@ -7,33 +7,38 @@ import {
   getTimeFromTimezone,
   setBackgroundColor,
 } from "../util";
+import { differenceInHours } from "date-fns";
 
-export const setAnimation = async function (div, weatherData) {
-  const timezone = weatherData.timezone;
-  const time = getTimeFromTimezone(timezone);
-  const currentConditions = weatherData.currentConditions;
+export const setAnimation = async function (div, weatherData, summaryData) {
+  console.log(weatherData);
+  console.log(summaryData);
+  const timezone = summaryData.timezone;
+  const sunrise = `2025-01-01 ${weatherData.currentConditions.sunrise}`;
+  const sunset = `2025-01-01 ${weatherData.currentConditions.sunset}`;
+  const curtime = `2025-01-01 ${weatherData.currentConditions.datetime}`;
+  const currentConditions = summaryData.currentConditions;
 
   const app = new Application();
   const cardContent = div.nextElementSibling;
   await app.init({
     resizeTo: cardContent,
   });
-  const baseColor = setBackgroundColor(time, currentConditions);
+  const baseColor = setBackgroundColor(
+    curtime,
+    sunrise,
+    sunset,
+    currentConditions,
+  );
   app.renderer.background.color = baseColor;
   // setBodyBackgroundColor(baseColor);
 
-  setSunMoonPosition(app, time);
+  setSunMoonPosition(app, curtime, sunrise, sunset);
   setClouds(app, currentConditions);
   //   puffyCloud(app);
   div.appendChild(app.canvas);
 };
 
-function setBodyBackgroundColor(baseColor) {
-  const body = document.querySelector("body");
-  body.style.backgroundColor = baseColor;
-}
-
-const setSunMoonPosition = async function (app, time) {
+const setSunMoonPosition = async function (app, curtime, sunrise, sunset) {
   await Promise.all([
     Assets.load(sun),
     Assets.load(moon),
@@ -46,15 +51,11 @@ const setSunMoonPosition = async function (app, time) {
   const rendererWidth = app.renderer.width;
   const rendererHeight = app.renderer.height;
 
-  const sunrise = "7:00 AM";
-  const sunset = "7:00 PM";
+  if (curtime > sunrise && curtime < sunset) {
+    const progress =
+      Math.abs(differenceInHours(curtime, sunrise)) /
+      Math.abs(differenceInHours(sunset, sunrise));
 
-  const curTime = convertToDate(time);
-  const sunriseTime = convertToDate(sunrise);
-  const sunsetTime = convertToDate(sunset);
-
-  if (curTime > convertToDate(sunrise) && curTime < convertToDate(sunset)) {
-    const progress = (curTime - sunriseTime) / (sunsetTime - sunriseTime);
     sunOrb.scale.set(0.022, 0.022);
     sunOrb.anchor.set(0.5, 0.5);
     sunOrb.position.set(progress * rendererWidth, 30);
@@ -80,22 +81,6 @@ const setSunMoonPosition = async function (app, time) {
     });
     app.stage.addChild(sunSprite, sunOrb);
   } else {
-    moonSprite.scale.set(0.015, 0.015);
-    const nightStart = convertToDate("7:00 PM");
-    const nightEnd = convertToDate("7:00 AM"); // Next day
-
-    let progress;
-    if (curTime >= nightStart) {
-      progress =
-        (curTime - nightStart) / (convertToDate("11:59 PM") - nightStart);
-    } else {
-      progress =
-        (curTime - convertToDate("12:00 AM")) /
-        (nightEnd - convertToDate("12:00 AM"));
-    }
-
-    moonSprite.position.set(progress * rendererWidth, 10);
-    app.stage.addChild(moonSprite);
   }
 };
 
