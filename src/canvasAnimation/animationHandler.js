@@ -1,4 +1,12 @@
-import { Application, Assets, Sprite } from "pixi.js";
+import {
+  Application,
+  Assets,
+  Sprite,
+  Container,
+  Graphics,
+  Color,
+  Texture,
+} from "pixi.js";
 import sun from "../assets/sprites/sun.png";
 import moon from "../assets/sprites/moon.png";
 import sun_orb from "../assets/sprites/sun_orb.png";
@@ -34,7 +42,7 @@ export const setAnimation = async function (div, weatherData, summaryData) {
 
   setSunMoonPosition(app, curtime, sunrise, sunset);
   setClouds(app, currentConditions);
-  //   puffyCloud(app);
+
   div.appendChild(app.canvas);
 };
 
