@@ -98,12 +98,10 @@ export const initSearch = function (userLocationLatLon, unit, tempUnit) {
   searchInput.addEventListener("input", async (event) => {
     results.innerHTML = "";
     let inputStr = event.target.value;
+    const lat = userLocationLatLon ? userLocationLatLon.lat : 0;
+    const lon = userLocationLatLon ? userLocationLatLon.lon : 0;
     if (inputStr.length >= 4) {
-      const autoResponse = await debouncePlaceAutoComplete(
-        inputStr,
-        userLocationLatLon.lat,
-        userLocationLatLon.lon,
-      );
+      const autoResponse = await debouncePlaceAutoComplete(inputStr, lat, lon);
       const data = await autoResponse.json();
       const results = data.results.map((res) => {
         const address_long = res.formatted;
