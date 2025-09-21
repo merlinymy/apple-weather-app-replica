@@ -42,7 +42,8 @@ body {
 }
 
 .wrap {
-    /* display: flex; */
+    display: flex;
+    justify-content:center;
     width: 100dvw;
 }
 
@@ -57,7 +58,7 @@ body {
     overflow: hidden;
     padding: 0.55rem;
     flex: 4 0 auto;
-    /* max-width: 300px; */
+    width: clamp(20rem, 100dvw, 35rem);
     background-color: rgb(0, 0, 0);
 }
 
@@ -151,7 +152,7 @@ dialog:open{
     position: absolute;
     top: 0%;
     z-index: 10;
-    width: 100dvw;
+    width: clamp(20rem, 100dvw, 35rem);
     color: var(--white-transparent);
 }
 
