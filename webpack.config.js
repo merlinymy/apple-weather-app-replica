@@ -8,6 +8,7 @@ module.exports = {
     filename: "main.js",
     path: path.resolve(__dirname, "dist"),
     clean: true,
+    publicPath: '/apple-weather-app-replica/',
   },
   plugins: [
     new HtmlWebpackPlugin({
