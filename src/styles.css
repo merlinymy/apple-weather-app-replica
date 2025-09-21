@@ -59,7 +59,6 @@ body {
     overflow: hidden;
     padding: 0.55rem;
     flex: 4 0 auto;
-    width: clamp(20rem, 100dvw, 35rem);
     background-color: rgb(0, 0, 0);
 }
 
@@ -153,7 +152,7 @@ dialog:open{
     position: absolute;
     top: 0%;
     z-index: 10;
-    width: clamp(20rem, 100dvw, 35rem);
+    width: 100dvw;
     color: var(--white-transparent);
 }
 
