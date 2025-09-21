@@ -27,7 +27,7 @@ jobs:
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist   # <- change if your Webpack output dir is different
+          path: ./dist   # <-- if your Webpack output dir is different, change this
   deploy:
     needs: build
     runs-on: ubuntu-latest
